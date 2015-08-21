@@ -1,0 +1,163 @@
+<html>
+
+<head>
+	<style>
+		body {
+			background-color: #000000;
+			margin: 0px;
+		}
+		
+		canvas,
+		img {
+			image-rendering: optimizeSpeed;
+			image-rendering: -moz-crisp-edges;
+			image-rendering: -webkit-optimize-contrast;
+			image-rendering: optimize-contrast;
+			-ms-interpolation-mode: nearest-neighbor;
+		}
+	</style>
+	<title>stuff</title>
+</head>
+
+<body>
+	<canvas id="gridCanvas" width="1000" height="1000"></canvas>
+	<script type="text/javascript">
+		var pixels;
+		var canvasSize = 1000;
+		var dotCount = 1000;//canvasSize / 2;
+						
+		function Color(r, g, b, a){
+			this.r = r || Math.floor(Math.random() * 255);
+			this.g = g || Math.floor(Math.random() * 255);
+			this.b = b || Math.floor(Math.random() * 255);
+			this.a = a || 255;
+		}
+		
+		function Point(x, y){
+			this.x = x || 0;
+			this.y = y || 0;
+		}
+		
+		function Dot(x, y, m){
+			var self = this;
+			self.x = x || Math.floor(Math.random() * canvasSize);
+			self.y = y || Math.floor(Math.random() * canvasSize);
+			self.color = new Color();
+			var kick = 65;
+			var halfKick = kick/2;
+			self.vector = new Point((Math.random() *kick) - halfKick, (Math.random() * kick) - halfKick);
+			self.mass =  m || .1;
+			
+			if (self.mass < 0) 
+				{
+					self.color = new Color(255,1,1); 
+				}
+				else 
+				{
+					self.color = new Color(1,255,1); 
+				}
+			
+			self.CheckBounds = function(lBound, uBound){
+				    if (self.x > uBound) { self.x = uBound; self.vector.x *= -1;}// self.vector.y = 0; }
+				    if (self.x < lBound) { self.x = lBound; self.vector.x *= -1;}// self.vector.x = 0; self.vector.y = 0; }
+				    if (self.y > uBound) { self.y = uBound; self.vector.y *= -1;}// self.vector.x = 0; self.vector.y = 0; }
+				    if (self.y < lBound) { self.y = lBound; self.vector.y *= -1;}// self.vector.x = 0; self.vector.y = 0; }
+					// // wrap
+					// if (self.x > uBound) { self.x = lBound; }
+					// if (self.x < lBound) { self.x = uBound; }
+					// if (self.y > uBound) { self.y = lBound; }
+					// if (self.y < lBound) { self.y = uBound; }
+					  
+				  // "friction" 
+				   self.vector.x /= 1.003;
+				   self.vector.y /= 1.003;
+			}
+			
+			self.ComputeForce = function(x,y,m){
+					if (!(x == self.x && y == self.y))
+					{
+						var dx = x - self.x;
+						var dy = y - self.y;
+						var distance = Math.sqrt((dx*dx) + (dy * dy));
+						var mag = 1 / (distance * distance);
+						if(distance > 1) {
+							self.vector.x += dx * m * mag;
+							self.vector.y += dy * m * mag;
+						}
+					}				
+			}
+			
+			self.DoMovement = function(){
+				self.CheckBounds(0, canvasSize);
+						
+				self.x += self.vector.x;
+				self.y += self.vector.y;
+			}
+		}
+		
+		window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+	
+		function init() {
+			var vectors = [];
+			for (var i = 0; i <= dotCount; i++) { vectors.push(new Dot(500,500)); }
+
+					
+			DrawGrid(vectors);
+			
+		}
+	
+		function DrawGrid(dots) {
+				
+			for (var i = 0; i <= dotCount; i++) {
+				dots[i].collision = false;
+				  for (var j = 0; j <= dotCount; j++) {
+				 	 if (i != j){
+				 		dots[i].ComputeForce(dots[j].x, dots[j].y, dots[j].mass);
+				 	 }
+				  }
+			}
+			
+			for (var i = 0; i <= dotCount; i++) {
+				dots[i].DoMovement();
+			}
+			
+			
+				var ctx = document.getElementById('gridCanvas').getContext('2d');
+				
+				ctx.fillStyle = "rgb(0,0,0)";
+				ctx.fillRect (0, 0, canvasSize, canvasSize);
+				
+				ctx.beginPath();
+				ctx.moveTo(0,0);
+				ctx.lineTo(300,150);
+				ctx.stroke();
+	
+			
+				// clear screen
+				pixels = ctx.createImageData(canvasSize, canvasSize);
+		
+				var index = 0;
+				var dot;
+				// draw
+				for (var i = dotCount-1; i >= 0; i--) {
+					dot = dots[i];
+					index = (Math.floor(dot.x) + Math.floor(dot.y) * canvasSize) * 4;
+					pixels.data[index] = dot.color.r;
+					pixels.data[index+1] = dot.color.g;
+					pixels.data[index+2] = dot.color.b;
+					pixels.data[index+3] = dot.color.a;
+						
+				}
+				
+				ctx.putImageData(pixels, 0, 0);
+			
+			
+			setTimeout(function () { DrawGrid(dots) }, 1);
+			return;
+		}
+	
+		init();
+	</script>
+</body>
+
+</html>
