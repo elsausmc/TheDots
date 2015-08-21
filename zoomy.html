@@ -43,8 +43,8 @@
 			self.x = x || Math.floor(Math.random() * canvasSize);
 			self.y = y || Math.floor(Math.random() * canvasSize);
 			self.color = new Color();
-			var kick = 65;
-			var halfKick = kick/2;
+			var kick = 5;
+			var halfKick = kick / 2;
 			self.vector = new Point((Math.random() *kick) - halfKick, (Math.random() * kick) - halfKick);
 			self.mass =  m || .1;
 			
@@ -58,19 +58,26 @@
 				}
 			
 			self.CheckBounds = function(lBound, uBound){
-				    if (self.x > uBound) { self.x = uBound; self.vector.x *= -1;}// self.vector.y = 0; }
-				    if (self.x < lBound) { self.x = lBound; self.vector.x *= -1;}// self.vector.x = 0; self.vector.y = 0; }
-				    if (self.y > uBound) { self.y = uBound; self.vector.y *= -1;}// self.vector.x = 0; self.vector.y = 0; }
-				    if (self.y < lBound) { self.y = lBound; self.vector.y *= -1;}// self.vector.x = 0; self.vector.y = 0; }
-					// // wrap
+					
+					// Bounce
+				    if (self.x > uBound) { self.x = uBound; self.vector.x *= -1;}
+				    if (self.x < lBound) { self.x = lBound; self.vector.x *= -1;}
+				    if (self.y > uBound) { self.y = uBound; self.vector.y *= -1;}
+				    if (self.y < lBound) { self.y = lBound; self.vector.y *= -1;}
+					// Bonk
+					// if (self.x > uBound) { self.x = uBound; self.vector.x = 0; self.vector.y = 0; }
+				    // if (self.x < lBound) { self.x = lBound; self.vector.x = 0; self.vector.y = 0; }
+				    // if (self.y > uBound) { self.y = uBound; self.vector.x = 0; self.vector.y = 0; }
+				    // if (self.y < lBound) { self.y = lBound; self.vector.x = 0; self.vector.y = 0; }
+					// wrap
 					// if (self.x > uBound) { self.x = lBound; }
 					// if (self.x < lBound) { self.x = uBound; }
 					// if (self.y > uBound) { self.y = lBound; }
 					// if (self.y < lBound) { self.y = uBound; }
 					  
 				  // "friction" 
-				   self.vector.x /= 1.003;
-				   self.vector.y /= 1.003;
+				   self.vector.x /= 1.005;
+				   self.vector.y /= 1.005;
 			}
 			
 			self.ComputeForce = function(x,y,m){
@@ -107,7 +114,7 @@
 		}
 	
 		function DrawGrid(dots) {
-				
+			
 			for (var i = 0; i <= dotCount; i++) {
 				dots[i].collision = false;
 				  for (var j = 0; j <= dotCount; j++) {
