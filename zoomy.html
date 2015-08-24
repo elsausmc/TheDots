@@ -26,7 +26,9 @@
 		var canvasSize = 1000;
 		var dotCount = 3000;	//canvasSize / 2;
 		var friction = 1.005;
-						
+		var kick = 10;
+		var halfKick = kick / 2;	
+		
 		function Color(r, g, b, a){
 			this.r = r || Math.floor(Math.random() * 255);
 			this.g = g || Math.floor(Math.random() * 255);
@@ -44,8 +46,7 @@
 			self.x = x || Math.floor(Math.random() * canvasSize);
 			self.y = y || Math.floor(Math.random() * canvasSize);
 			self.color = new Color();
-			var kick = 5;
-			var halfKick = kick / 2;
+		
 			self.vector = new Point((Math.random() *kick) - halfKick, (Math.random() * kick) - halfKick);
 			self.mass =  m || .1;
 			
@@ -96,7 +97,7 @@
 		
 		function init() {
 			var vectors = [];
-			for (var i = 0; i <= dotCount; i++) { vectors.push(new Dot()); }
+			for (var i = 0; i <= dotCount; i++) { vectors.push(new Dot(500, 500)); }
 					
 			DrawGrid(vectors);
 			
@@ -110,7 +111,7 @@
 							var dy = dots[j].y - dots[i].y;
 							var distance = Math.sqrt((dx*dx) + (dy * dy));
 							var mag = 1 / (distance * distance);
-							if(distance > 0) {
+							if(distance > 1) {
 								dots[i].vector.x += dx * mag * dots[j].mass;
 								dots[i].vector.y += dy * mag * dots[j].mass;
 								
