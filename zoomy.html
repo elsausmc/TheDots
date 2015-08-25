@@ -22,11 +22,13 @@
 <body>
 	<canvas id="gridCanvas" width="1000" height="1000"></canvas>
 	<script type="text/javascript">
+	var ctx = document.getElementById('gridCanvas').getContext('2d');
+			
 		var pixels;
 		var canvasSize = 1000;
-		var dotCount = 3000;	//canvasSize / 2;
-		var friction = 1.005;
-		var kick = 10;
+		var dotCount = 100;	//canvasSize / 2;
+		var friction = 1;//.005;
+		var kick = 16;
 		var halfKick = kick / 2;	
 		
 		function Color(r, g, b, a){
@@ -61,10 +63,11 @@
 			
 			self.Bounce = function(){
 					// Bounce
-				    if (self.x > canvasSize) { self.x = canvasSize; self.vector.x *= -1;}
-				    if (self.x < 0) { self.x = 0; self.vector.x *= -1;}
-				    if (self.y > canvasSize) { self.y = canvasSize; self.vector.y *= -1;}
-				    if (self.y < 0) { self.y = 0; self.vector.y *= -1;}
+					var bounce = -.5
+				    if (self.x > canvasSize) { self.x = canvasSize; self.vector.x *= bounce;}
+				    if (self.x < 0) { self.x = 0; self.vector.x *= bounce;}
+				    if (self.y > canvasSize) { self.y = canvasSize; self.vector.y *= bounce;}
+				    if (self.y < 0) { self.y = 0; self.vector.y *= bounce;}
 			}
 			
 			self.Bonk = function(){
@@ -75,7 +78,7 @@
 				     if (self.y < 0) { self.y = 0; self.vector.x = 0; self.vector.y = 0; }			
 			}
 			
-			self.Bonk = function(){
+			self.Wrap = function(){
 					// wrap
 					 if (self.x > canvasSize) { self.x = 0; }
 					 if (self.x < 0) { self.x = canvasSize; }
@@ -84,73 +87,62 @@
 			}
 						
 			self.DoMovement = function(){
-				self.Bonk();
-
+				
 				self.x += self.vector.x;
 				self.y += self.vector.y;
 
 				// "friction" 
 				self.vector.x /= friction;
 				self.vector.y /= friction;
+
+				self.Bounce();
 			}
 		}
 		
 		function init() {
 			var vectors = [];
-			for (var i = 0; i <= dotCount; i++) { vectors.push(new Dot(500, 500)); }
+			for (var i = 0; i <= dotCount; i++) { vectors.push(new Dot(500,500)); }
 					
 			DrawGrid(vectors);
 			
 		}
 	
 		function DrawGrid(dots) {
-			for (var i = 0; i <= dotCount; i++) {
-				dots[i].collision = false;
-				  for (var j = i+1; j <= dotCount; j++) {
-							var dx = dots[j].x - dots[i].x;
-							var dy = dots[j].y - dots[i].y;
-							var distance = Math.sqrt((dx*dx) + (dy * dy));
-							var mag = 1 / (distance * distance);
-							if(distance > 1) {
-								dots[i].vector.x += dx * mag * dots[j].mass;
-								dots[i].vector.y += dy * mag * dots[j].mass;
-								
-								dots[j].vector.x -= dx * mag * dots[i].mass;
-								dots[j].vector.y -= dy * mag * dots[i].mass;				 
-				 	 		}
+		   for(var i = dotCount; i > 0; i--){ var imo = i-1;
+			   for(var j=imo; j > 0; j--){
+					var dx = dots[j].x - dots[i].x;
+					var dy = dots[j].y - dots[i].y;
+					var distance = Math.sqrt((dx*dx) + (dy * dy));
+					if(distance > 1) {					
+						var mag = 1 / (distance * distance);
+						dots[i].vector.x += dx * mag * dots[j].mass;
+						dots[i].vector.y += dy * mag * dots[j].mass;
+						
+						dots[j].vector.x -= dx * mag * dots[i].mass;
+						dots[j].vector.y -= dy * mag * dots[i].mass;				 
+					}
 				  }
 			}
 			
-			for (var i = 0; i <= dotCount; i++) {
+			for(var i = dotCount; i > 0; i--){ 
 				dots[i].DoMovement();
 			}
 			
-			
-				var ctx = document.getElementById('gridCanvas').getContext('2d');
-				
-				ctx.fillStyle = "rgb(0,0,0)";
-				ctx.fillRect (0, 0, canvasSize, canvasSize);
-				
-				ctx.beginPath();
-				ctx.moveTo(0,0);
-				ctx.lineTo(300,150);
-				ctx.stroke();
-	
 			
 				// clear screen
 				pixels = ctx.createImageData(canvasSize, canvasSize);
 		
 				var index = 0;
 				var dot;
+				
 				// draw
-				for (var i = dotCount-1; i >= 0; i--) {
+				for (var i = dotCount; i > 0; i--) {
 					dot = dots[i];
 					index = (Math.floor(dot.x) + Math.floor(dot.y) * canvasSize) * 4;
 					pixels.data[index] = dot.color.r;
 					pixels.data[index+1] = dot.color.g;
 					pixels.data[index+2] = dot.color.b;
 					pixels.data[index+3] = dot.color.a;
-						
 				}
 				
 				ctx.putImageData(pixels, 0, 0);
