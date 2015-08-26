@@ -27,8 +27,8 @@
 		var pixels;
 		var canvasSize = 1000;
 		var center = canvasSize / 2;
-		var dotCount = 1000;
-		var friction = 1.005;
+		var dotCount = 100;
+		var friction = 1;//.005;
 		var kick = 0;
 		var halfKick = kick / 2;	
 		
@@ -51,7 +51,7 @@
 			self.x = x || (Math.random() * canvasSize)-center;
 			self.y = y || (Math.random() * canvasSize)-center;
 			self.z = z || (Math.random() * canvasSize);
-			self.mass =  .1;
+			self.mass =  .51;
 			self.vector = new Point((Math.random() *kick) - halfKick,(Math.random() *kick) - halfKick,(Math.random() *kick) - halfKick);
 			self.color = new Color();
 			
@@ -83,7 +83,7 @@
 							var dz = dots[j].z - dots[i].z;
 							var distance = Math.sqrt((dx*dx) + (dy * dy) + (dz * dz));
 							if(distance > 1) {					
-								var mag = 1 / (distance * distance * distance );
+								var mag = 1 / (distance * distance );
 								dots[i].vector.x += dx * mag * dots[j].mass;
 								dots[i].vector.y += dy * mag * dots[j].mass;
 								dots[i].vector.z += dz * mag * dots[j].mass;
@@ -117,9 +117,9 @@
 							if(x > 0 && x < canvasSize && y > 0 && y < canvasSize) {
 								index = (x + y * canvasSize) * 4;
 								var colorScale = 255-(Math.abs(dot.z) * .255);
-								pixels.data[index] = 255;
-								pixels.data[index+1] = 255;
-								pixels.data[index+2] = 255;
+								pixels.data[index] = dot.color.r;
+								pixels.data[index+1] = dot.color.g;
+								pixels.data[index+2] = dot.color.b;
 								pixels.data[index+3] = colorScale;
 							}
 						}
