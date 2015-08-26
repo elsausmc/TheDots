@@ -1,0 +1,158 @@
+<html>
+
+<head>
+	<style>
+		body {
+			background-color: #000000;
+			margin: 0px;
+		}
+		
+		canvas,
+		img {
+			image-rendering: optimizeSpeed;
+			image-rendering: -moz-crisp-edges;
+			image-rendering: -webkit-optimize-contrast;
+			image-rendering: optimize-contrast;
+			-ms-interpolation-mode: nearest-neighbor;
+		}
+	</style>
+	<title>stuff</title>
+</head>
+
+<body>
+	<canvas id="gridCanvas" width="1000" height="1000"></canvas>
+	<script type="text/javascript">
+	var ctx = document.getElementById('gridCanvas').getContext('2d');
+			
+		var pixels;
+		var canvasSize = 1000;
+		var dotCount = 100;	//canvasSize / 2;
+		var friction = 1;//.005;
+		var kick = 16;
+		var halfKick = kick / 2;	
+		
+		function Color(r, g, b, a){
+			this.r = r || Math.floor(Math.random() * 255);
+			this.g = g || Math.floor(Math.random() * 255);
+			this.b = b || Math.floor(Math.random() * 255);
+			this.a = a || 255;
+		}
+		
+		function Point(x, y){
+			this.x = x || 0;
+			this.y = y || 0;
+		}
+		
+		function Dot(x, y, m){
+			var self = this;
+			self.x = x || Math.floor(Math.random() * canvasSize);
+			self.y = y || Math.floor(Math.random() * canvasSize);
+			self.color = new Color();
+		
+			self.vector = new Point((Math.random() *kick) - halfKick, (Math.random() * kick) - halfKick);
+			self.mass =  m || .1;
+			
+			if (self.mass < 0) 
+				{
+					self.color = new Color(255,1,1); 
+				}
+				else 
+				{
+					self.color = new Color(255,255,255); 
+				}
+			
+			self.Bounce = function(){
+					// Bounce
+					var bounce = -.5
+				    if (self.x > canvasSize) { self.x = canvasSize; self.vector.x *= bounce;}
+				    if (self.x < 0) { self.x = 0; self.vector.x *= bounce;}
+				    if (self.y > canvasSize) { self.y = canvasSize; self.vector.y *= bounce;}
+				    if (self.y < 0) { self.y = 0; self.vector.y *= bounce;}
+			}
+			
+			self.Bonk = function(){
+					// Bonk
+					 if (self.x > canvasSize) { self.x = canvasSize; self.vector.x = 0; self.vector.y = 0; }
+				     if (self.x < 0) { self.x = 0; self.vector.x = 0; self.vector.y = 0; }
+				     if (self.y > canvasSize) { self.y = canvasSize; self.vector.x = 0; self.vector.y = 0; }
+				     if (self.y < 0) { self.y = 0; self.vector.x = 0; self.vector.y = 0; }			
+			}
+			
+			self.Wrap = function(){
+					// wrap
+					 if (self.x > canvasSize) { self.x = 0; }
+					 if (self.x < 0) { self.x = canvasSize; }
+					 if (self.y > canvasSize) { self.y = 0; }
+					 if (self.y < 0) { self.y = canvasSize; }
+			}
+						
+			self.DoMovement = function(){
+				
+				self.x += self.vector.x;
+				self.y += self.vector.y;
+
+				// "friction" 
+				self.vector.x /= friction;
+				self.vector.y /= friction;
+
+				self.Bounce();
+			}
+		}
+		
+		function init() {
+			var vectors = [];
+			for (var i = 0; i <= dotCount; i++) { vectors.push(new Dot(500,500)); }
+					
+			DrawGrid(vectors);
+			
+		}
+	
+		function DrawGrid(dots) {
+		   for(var i = dotCount; i > 0; i--){ var imo = i-1;
+			   for(var j=imo; j > 0; j--){
+					var dx = dots[j].x - dots[i].x;
+					var dy = dots[j].y - dots[i].y;
+					var distance = Math.sqrt((dx*dx) + (dy * dy));
+					if(distance > 1) {					
+						var mag = 1 / (distance * distance);
+						dots[i].vector.x += dx * mag * dots[j].mass;
+						dots[i].vector.y += dy * mag * dots[j].mass;
+						
+						dots[j].vector.x -= dx * mag * dots[i].mass;
+						dots[j].vector.y -= dy * mag * dots[i].mass;				 
+					}
+				  }
+			}
+			
+			for(var i = dotCount; i > 0; i--){ 
+				dots[i].DoMovement();
+			}
+			
+			
+				// clear screen
+				pixels = ctx.createImageData(canvasSize, canvasSize);
+		
+				var index = 0;
+				var dot;
+				
+				// draw
+				for (var i = dotCount; i > 0; i--) {
+					dot = dots[i];
+					index = (Math.floor(dot.x) + Math.floor(dot.y) * canvasSize) * 4;
+					pixels.data[index] = dot.color.r;
+					pixels.data[index+1] = dot.color.g;
+					pixels.data[index+2] = dot.color.b;
+					pixels.data[index+3] = dot.color.a;
+				}
+				
+				ctx.putImageData(pixels, 0, 0);
+			
+			setTimeout(function () { DrawGrid(dots) }, 1);
+			return;
+		}
+	
+		init();
+	</script>
+</body>
+
+</html>
