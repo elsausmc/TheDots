@@ -27,8 +27,11 @@
 		var pixels;
 		var canvasSize = 1000;
 		var center = canvasSize / 2;
-		var dotCount = 3000;
+		var dotCount = 1000;
 		var friction = 1.005;
+		var kick = 0;
+		var halfKick = kick / 2;	
+		
 		
 		function Color(r, g, b, a){
 			this.r = r || Math.floor(Math.random() * 255);
@@ -49,7 +52,7 @@
 			self.y = y || (Math.random() * canvasSize)-center;
 			self.z = z || (Math.random() * canvasSize);
 			self.mass =  .1;
-			self.vector = new Point();
+			self.vector = new Point((Math.random() *kick) - halfKick,(Math.random() *kick) - halfKick,(Math.random() *kick) - halfKick);
 			self.color = new Color();
 			
 			self.DoMovement = function(){
