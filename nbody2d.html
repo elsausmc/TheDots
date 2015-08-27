@@ -23,12 +23,14 @@
 	<canvas id="gridCanvas" width="1000" height="1000"></canvas>
 	<script type="text/javascript">
 	var ctx = document.getElementById('gridCanvas').getContext('2d');
-			
+		ctx.canvas.width = window.innerWidth;
+		ctx.canvas.height = window.innerHeight;
+		var centerX = ctx.canvas.width / 2;
+		var centerY = ctx.canvas.height / 2;
 		var pixels;
-		var canvasSize = 1000;
-		var dotCount = 100;	//canvasSize / 2;
-		var friction = 1;//.005;
-		var kick = 16;
+		var dotCount = 100;
+		var friction = 1.001;
+		var kick = 106;
 		var halfKick = kick / 2;	
 		
 		function Color(r, g, b, a){
@@ -45,8 +47,8 @@
 		
 		function Dot(x, y, m){
 			var self = this;
-			self.x = x || Math.floor(Math.random() * canvasSize);
-			self.y = y || Math.floor(Math.random() * canvasSize);
+			self.x = x || Math.floor(Math.random() * ctx.canvas.width);
+			self.y = y || Math.floor(Math.random() * ctx.canvas.height);
 			self.color = new Color();
 		
 			self.vector = new Point((Math.random() *kick) - halfKick, (Math.random() * kick) - halfKick);
@@ -64,26 +66,26 @@
 			self.Bounce = function(){
 					// Bounce
 					var bounce = -.5
-				    if (self.x > canvasSize) { self.x = canvasSize; self.vector.x *= bounce;}
+				    if (self.x > ctx.canvas.width) { self.x = ctx.canvas.width; self.vector.x *= bounce;}
 				    if (self.x < 0) { self.x = 0; self.vector.x *= bounce;}
-				    if (self.y > canvasSize) { self.y = canvasSize; self.vector.y *= bounce;}
+				    if (self.y > ctx.canvas.height) { self.y = ctx.canvas.height; self.vector.y *= bounce;}
 				    if (self.y < 0) { self.y = 0; self.vector.y *= bounce;}
 			}
 			
 			self.Bonk = function(){
 					// Bonk
-					 if (self.x > canvasSize) { self.x = canvasSize; self.vector.x = 0; self.vector.y = 0; }
+					 if (self.x > ctx.canvas.width) { self.x = ctx.canvas.width; self.vector.x = 0; self.vector.y = 0; }
 				     if (self.x < 0) { self.x = 0; self.vector.x = 0; self.vector.y = 0; }
-				     if (self.y > canvasSize) { self.y = canvasSize; self.vector.x = 0; self.vector.y = 0; }
+				     if (self.y > ctx.canvas.height) { self.y = ctx.canvas.height; self.vector.x = 0; self.vector.y = 0; }
 				     if (self.y < 0) { self.y = 0; self.vector.x = 0; self.vector.y = 0; }			
 			}
 			
 			self.Wrap = function(){
 					// wrap
-					 if (self.x > canvasSize) { self.x = 0; }
-					 if (self.x < 0) { self.x = canvasSize; }
-					 if (self.y > canvasSize) { self.y = 0; }
-					 if (self.y < 0) { self.y = canvasSize; }
+					 if (self.x > ctx.canvas.width) { self.x = 0; }
+					 if (self.x < 0) { self.x = ctx.canvas.width; }
+					 if (self.y > ctx.canvas.height) { self.y = 0; }
+					 if (self.y < 0) { self.y = ctx.canvas.height; }
 			}
 						
 			self.DoMovement = function(){
@@ -101,7 +103,7 @@
 		
 		function init() {
 			var vectors = [];
-			for (var i = 0; i <= dotCount; i++) { vectors.push(new Dot(500,500)); }
+			for (var i = 0; i <= dotCount; i++) { vectors.push(new Dot(centerX,centerY)); }
 					
 			DrawGrid(vectors);
 			
@@ -130,7 +132,7 @@
 			
 			
 				// clear screen
-				pixels = ctx.createImageData(canvasSize, canvasSize);
+				pixels = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
 		
 				var index = 0;
 				var dot;
@@ -138,11 +140,15 @@
 				// draw
 				for (var i = dotCount; i > 0; i--) {
 					dot = dots[i];
-					index = (Math.floor(dot.x) + Math.floor(dot.y) * canvasSize) * 4;
-					pixels.data[index] = dot.color.r;
-					pixels.data[index+1] = dot.color.g;
-					pixels.data[index+2] = dot.color.b;
-					pixels.data[index+3] = dot.color.a;
+					var x = Math.floor(dot.x);
+					var y = Math.floor(dot.y);
+					index = (x + y * ctx.canvas.width) * 4;
+					if (!(x < 0 || y < 0 || x > ctx.canvas.width || y > ctx.canvas.height)){
+						pixels.data[index] = dot.color.r;
+						pixels.data[index+1] = dot.color.g;
+						pixels.data[index+2] = dot.color.b;
+						pixels.data[index+3] = dot.color.a;
+					}
 				}
 				
 				ctx.putImageData(pixels, 0, 0);
