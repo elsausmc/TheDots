@@ -28,10 +28,11 @@
 		var centerX = ctx.canvas.width / 2;
 		var centerY = ctx.canvas.height / 2;
 		var pixels;
-		var dotCount = 100;
-		var friction = 1.001;
-		var kick = 106;
-		var halfKick = kick / 2;	
+		var dotCount = 1000;
+		var friction = 1.0025;
+		var kick = 0;
+		var halfKick = kick / 2;
+		var gravity = .1	
 		
 		function Color(r, g, b, a){
 			this.r = r || Math.floor(Math.random() * 255);
@@ -52,7 +53,7 @@
 			self.color = new Color();
 		
 			self.vector = new Point((Math.random() *kick) - halfKick, (Math.random() * kick) - halfKick);
-			self.mass =  m || .1;
+			self.mass =  m || 1;
 			
 			if (self.mass < 0) 
 				{
@@ -97,13 +98,13 @@
 				self.vector.x /= friction;
 				self.vector.y /= friction;
 
-				self.Bounce();
+				self.Bonk();
 			}
 		}
 		
 		function init() {
 			var vectors = [];
-			for (var i = 0; i <= dotCount; i++) { vectors.push(new Dot(centerX,centerY)); }
+			for (var i = 0; i <= dotCount; i++) { vectors.push(new Dot()); }
 					
 			DrawGrid(vectors);
 			
@@ -114,9 +115,9 @@
 			   for(var j=imo; j > 0; j--){
 					var dx = dots[j].x - dots[i].x;
 					var dy = dots[j].y - dots[i].y;
-					var distance = Math.sqrt((dx*dx) + (dy * dy));
-					if(distance > 1) {					
-						var mag = 1 / (distance * distance);
+					var distance = Math.sqrt((dx*dx) + (dy * dy) + 1000);
+					if(distance > 0) {					
+						var mag = (gravity * dots[i].mass * dots[i].mass) / (distance * distance);
 						dots[i].vector.x += dx * mag * dots[j].mass;
 						dots[i].vector.y += dy * mag * dots[j].mass;
 						
