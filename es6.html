@@ -1,0 +1,19 @@
+<html>
+	
+</html>
+
+<script>
+	'use strict'
+	class Test{
+		constructor(thing){
+			this.stuff = thing;
+			
+			this.DoStuff = function(){
+				console.log(this.stuff);
+			};
+		}	
+	}
+	
+	var testThing = new Test('wat');
+	testThing.DoStuff();
+</script>
