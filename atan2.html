@@ -28,7 +28,7 @@
 		var centerX = ctx.canvas.width / 2;
 		var centerY = ctx.canvas.height / 2;
 		var pixels;
-		var dotCount = 2000;
+		var dotCount = 1000;
 		var friction = 1;//.025;
 		var kick = 0;
 		var halfKick = kick / 2;
@@ -82,9 +82,9 @@
 			}
 						
 			self.DoMovement = function(){
-				
-				self.x += self.vector.x;
-				self.y += self.vector.y;
+				var at2 = Math.atan2(self.vector.y,self.vector.x)
+				self.x += Math.cos(at2);
+				self.y += Math.sin(at2);
 
 				// "friction" 
 				  self.vector.x /= friction;
@@ -109,7 +109,7 @@
 					var dy = dots[j].y - dots[i].y;
 					var distance = Math.sqrt((dx*dx) + (dy * dy));
 					if(distance > 1) {					
-						var mag = (gravity * dots[i].mass * dots[i].mass) / (distance * distance * distance);
+						var mag = (gravity * dots[i].mass * dots[i].mass) / (distance * distance);
 						dots[i].vector.x += dx * mag * dots[j].mass;
 						dots[i].vector.y += dy * mag * dots[j].mass;
 						
