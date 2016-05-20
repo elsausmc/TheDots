@@ -22,10 +22,10 @@
 
             // Wrap to other side
             this.BoundsCheck = function () {
-                if (this.x > canvas.width) { this.x = 0; }
-                if (this.x < 0) { this.x = canvas.width; }
-                if (this.y > canvas.height) { this.y = 0; }
-                if (this.y < 0) { this.y = canvas.height; }
+                if (this.x > canvas.width) { this.x =canvas.width; }
+                if (this.x < 0) { this.x = 0; }
+                if (this.y > canvas.height) { this.y = canvas.height; }
+                if (this.y < 0) { this.y = 0; }
             }
         }
 
@@ -54,7 +54,8 @@
                 this.Location.BoundsCheck();
             }
 
-            this.SetDestination = function (newDestination) {
+            this.SetDestination = function (newDestination,mass) {
+                mass /= 10;
                 if (newDestination === this.Destination) { return; }
                 this.Destination = newDestination;
                 
@@ -62,8 +63,8 @@
                 var dy = (this.Destination.y - this.Location.y);
                 var distance = Math.sqrt((dx * dx) + (dy * dy));
                 var mag = 1/distance;
-                this.mx = dx * mag;
-                this.my = dy * mag;
+                this.mx = dx * mag * mass;
+                this.my = dy * mag * mass;
             }
 
             ////this.SetDestination(new Point(this.Location.x + (parseInt(Math.random() * 100) - 50), this.Location.y + (parseInt(Math.random() * 100) - 50)));
@@ -75,7 +76,7 @@
             this.Units = new Array();
             this.Location = new Point((Math.random() * canvas.width), (Math.random() * canvas.height));
             this.Color = 'rgb(' + parseInt(Math.random() * 255) + ',' + parseInt(Math.random() * 255) + ',' + parseInt(Math.random() * 255) + ')'
-            this.MaxInterval = 6000
+            this.MaxInterval = 60000
             this.DirectionInterval = parseInt(Math.random() * this.MaxInterval);
             this.LastDirectionTick = (new Date()).getTime();
 
@@ -110,7 +111,7 @@
                     var unitCount = 0;
                     var targetGenerator = -1;
                     for (var gen = 0; gen < Generators.length; gen++) {
-                        if (Generators[gen].Units.length >= unitCount) {
+                        if (Generators[gen].Units.length>= unitCount) {
                             NewLocation = Generators[gen].Location;
                             unitCount = Generators[gen].Units.length;
                         }
@@ -118,7 +119,7 @@
                     //}
 
                     for (var unit = 0; unit < this.Units.length; unit++) {
-                        this.Units[unit].SetDestination(NewLocation);
+                        this.Units[unit].SetDestination(NewLocation,unitCount);
                     }
                     this.LastDirectionTick = (new Date()).getTime();
                     this.DirectionInterval = parseInt(Math.random() * this.MaxInterval);
