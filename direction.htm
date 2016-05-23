@@ -54,7 +54,7 @@
                 this.Location.BoundsCheck();
             }
 
-            this.SetDestination = function (newDestination) {
+            this.SetDestination = function (newDestination, mass) {
                 if (newDestination === this.Destination) { return; }
                 this.Destination = newDestination;
                 
@@ -62,8 +62,8 @@
                 var dy = (this.Destination.y - this.Location.y);
                 var distance = Math.sqrt((dx * dx) + (dy * dy));
                 var mag = 1/distance;
-                this.mx = dx * mag;
-                this.my = dy * mag;
+                this.mx = dx * mag * mass;
+                this.my = dy * mag * mass;
             }
 
             ////this.SetDestination(new Point(this.Location.x + (parseInt(Math.random() * 100) - 50), this.Location.y + (parseInt(Math.random() * 100) - 50)));
@@ -75,12 +75,12 @@
             this.Units = new Array();
             this.Location = new Point((Math.random() * canvas.width), (Math.random() * canvas.height));
             this.Color = 'rgb(' + parseInt(Math.random() * 255) + ',' + parseInt(Math.random() * 255) + ',' + parseInt(Math.random() * 255) + ')'
-            this.MaxInterval = 6000
+            this.MaxInterval = 30000;
             this.DirectionInterval = parseInt(Math.random() * this.MaxInterval);
             this.LastDirectionTick = (new Date()).getTime();
 
             this.AddUnit = function () {
-                if (((new Date()).getTime() - this.LastTick) > 1000) {
+                if (((new Date()).getTime() - this.LastTick) > 500) {
                     this.Units.push(new Unit(new Point(this.Location.x, this.Location.y)));
                     this.LastTick = (new Date()).getTime();
                 }
@@ -118,7 +118,7 @@
                     //}
 
                     for (var unit = 0; unit < this.Units.length; unit++) {
-                        this.Units[unit].SetDestination(NewLocation);
+                        this.Units[unit].SetDestination(NewLocation, unitCount/10);
                     }
                     this.LastDirectionTick = (new Date()).getTime();
                     this.DirectionInterval = parseInt(Math.random() * this.MaxInterval);
