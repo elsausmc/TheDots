@@ -56,6 +56,7 @@
 
             this.SetDestination = function (newDestination,mass) {
                 mass /= 10;
+
                 if (newDestination === this.Destination) { return; }
                 this.Destination = newDestination;
                 
@@ -81,7 +82,7 @@
             this.LastDirectionTick = (new Date()).getTime();
 
             this.AddUnit = function () {
-                if (((new Date()).getTime() - this.LastTick) > 1000) {
+                if (((new Date()).getTime() - this.LastTick) > 500) {
                     this.Units.push(new Unit(new Point(this.Location.x, this.Location.y)));
                     this.LastTick = (new Date()).getTime();
                 }
