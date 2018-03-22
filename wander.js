@@ -95,7 +95,7 @@ Dot.prototype.CheckWallDeath = function() {
 };
 
 Dot.prototype.NearWall = function() {
-  let padding = longestLife * 10000000;
+  let padding = 10; // shrinking wall longestLife * 10000000;
   return (
     this.x > ctx.canvas.width - padding ||
     this.x < padding ||
