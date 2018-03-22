@@ -6,13 +6,13 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 10000;
-let friction = 1; //.025;
+let dotCount = 100;
 let kick = 0;
 let halfKick = kick / 2;
 let gravity = 1;
 let oldestDot = 0;
 let longestLife = 0.000000001;
+let dots = [];
 
 function Color(r, g, b, a) {
   this.r = r || 255;
@@ -34,14 +34,21 @@ function Dot(x, y, m) {
   self.y = centerY; //// y || Math.floor(Math.random() * ctx.canvas.height);
   this.neurons = [];
   this.ticks = 0;
+  this.loneliness = 0;
+  this.loneRate = 0;
+  this.closeness = 0;
   this.Init();
 }
 
 Dot.prototype.Init = function() {
   this.x = centerX;
   this.y = centerY;
+  this.loneliness = 0;
+  this.loneRate = Math.random() * 1;
+  this.closeness = Math.floor(Math.random() * 100);
+
   this.neurons = [];
-  let neuronCount = 4;
+  let neuronCount = 5;
   for (let index = 0; index < neuronCount; index++) {
     this.neurons.push(new neuron(neuronCount));
   }
@@ -52,8 +59,9 @@ Dot.prototype.Think = function() {
   // this.neurons[3].value = this.NearWall ? 1 : -1;
   this.neurons[2].value = (centerX - this.x) / centerX;
   this.neurons[3].value = (centerY - this.y) / centerY;
+  this.neurons[4].value = this.loneliness;
 
-  let newValues = [0, 0, 0, 0];
+  let newValues = [0, 0, 0, 0, 0];
 
   for (let index = 0; index < this.neurons.length; index++) {
     for (
@@ -88,8 +96,8 @@ Dot.prototype.Wrap = function() {
   }
 };
 
-Dot.prototype.CheckWallDeath = function() {
-  if (this.NearWall()) {
+Dot.prototype.CheckDeath = function() {
+  if (this.NearWall() || this.loneliness > 1) {
     this.Init();
   }
 };
@@ -102,6 +110,20 @@ Dot.prototype.NearWall = function() {
     this.y > ctx.canvas.height - padding ||
     this.y < padding
   );
+};
+
+Dot.prototype.NearDot = function() {
+  dots.forEach(otherDot => {
+    if (
+      !(this.x === otherDot.x && this.y === otherDot.y) &&
+      Math.abs(this.x - otherDot.x) < this.closeness &&
+      Math.abs(this.y - otherDot.y) < this.closeness
+    ) {
+      this.loneliness -= this.loneRate;
+    }
+  });
+
+  this.loneliness += this.loneRate;
 };
 
 Dot.prototype.LimitSpeed = function() {
@@ -120,6 +142,7 @@ Dot.prototype.LimitSpeed = function() {
 };
 
 Dot.prototype.DoMovement = function() {
+  this.NearDot();
   this.Think();
 
   this.vector.x = this.neurons[0].value;
@@ -131,7 +154,7 @@ Dot.prototype.DoMovement = function() {
   this.y += this.vector.y;
 
   //this.Wrap();
-  this.CheckWallDeath();
+  this.CheckDeath();
   this.ticks += 0.00000001;
   if (this.ticks > longestLife) {
     longestLife = this.ticks;
@@ -161,15 +184,14 @@ neuron.prototype.Init = function() {
 // };
 
 function init() {
-  let vectors = [];
   for (let i = 0; i <= dotCount; i++) {
-    vectors.push(new Dot());
+    dots.push(new Dot());
   }
 
-  DrawGrid(vectors);
+  DrawGrid();
 }
 
-function DrawGrid(dots) {
+function DrawGrid() {
   for (let i = dotCount; i > 0; i--) {
     dots[i].DoMovement();
   }
@@ -197,7 +219,7 @@ function DrawGrid(dots) {
   ctx.putImageData(pixels, 0, 0);
 
   setTimeout(function() {
-    DrawGrid(dots);
+    DrawGrid();
   }, 1);
   return;
 }
