@@ -6,11 +6,13 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 1000;
+let dotCount = 10000;
 let friction = 1; //.025;
 let kick = 0;
 let halfKick = kick / 2;
 let gravity = 1;
+let oldestDot = 0;
+let longestLife = 0.000000001;
 
 function Color(r, g, b, a) {
   this.r = r || 255;
@@ -28,16 +30,16 @@ function Dot(x, y, m) {
   let self = this;
   self.color = new Color();
   self.vector = new Point(0, 0);
-  self.x = x || Math.floor(Math.random() * ctx.canvas.width);
-  self.y = y || Math.floor(Math.random() * ctx.canvas.height);
+  self.x = centerX; //// x || Math.floor(Math.random() * ctx.canvas.width);
+  self.y = centerY; //// y || Math.floor(Math.random() * ctx.canvas.height);
   this.neurons = [];
   this.ticks = 0;
   this.Init();
 }
 
 Dot.prototype.Init = function() {
-  this.x = Math.floor(Math.random() * ctx.canvas.width);
-  this.y = Math.floor(Math.random() * ctx.canvas.height);
+  this.x = centerX;
+  this.y = centerY;
   this.neurons = [];
   let neuronCount = 4;
   for (let index = 0; index < neuronCount; index++) {
@@ -46,6 +48,11 @@ Dot.prototype.Init = function() {
 };
 
 Dot.prototype.Think = function() {
+  // mix in inputs.
+  // this.neurons[3].value = this.NearWall ? 1 : -1;
+  this.neurons[2].value = (centerX - this.x) / centerX;
+  this.neurons[3].value = (centerY - this.y) / centerY;
+
   let newValues = [0, 0, 0, 0];
 
   for (let index = 0; index < this.neurons.length; index++) {
@@ -82,14 +89,19 @@ Dot.prototype.Wrap = function() {
 };
 
 Dot.prototype.CheckWallDeath = function() {
-  if (
-    this.x > ctx.canvas.width ||
-    this.x < 0 ||
-    this.y > ctx.canvas.height ||
-    this.y < 0
-  ) {
+  if (this.NearWall()) {
     this.Init();
   }
+};
+
+Dot.prototype.NearWall = function() {
+  let padding = longestLife * 10000000;
+  return (
+    this.x > ctx.canvas.width - padding ||
+    this.x < padding ||
+    this.y > ctx.canvas.height - padding ||
+    this.y < padding
+  );
 };
 
 Dot.prototype.LimitSpeed = function() {
@@ -120,7 +132,10 @@ Dot.prototype.DoMovement = function() {
 
   //this.Wrap();
   this.CheckWallDeath();
-  this.ticks += 0.000000001;
+  this.ticks += 0.00000001;
+  if (this.ticks > longestLife) {
+    longestLife = this.ticks;
+  }
 };
 
 function neuron(neuronCount) {
