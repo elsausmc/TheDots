@@ -30,8 +30,8 @@ function Dot(x, y, m) {
   let self = this;
   self.color = new Color();
   self.vector = new Point(0, 0);
-  self.x = centerX; //// x || Math.floor(Math.random() * ctx.canvas.width);
-  self.y = centerY; //// y || Math.floor(Math.random() * ctx.canvas.height);
+  self.x = centerX;
+  self.y = centerY;
   this.neurons = [];
   this.ticks = 0;
   this.loneliness = 0;
@@ -44,7 +44,7 @@ Dot.prototype.Init = function() {
   this.x = centerX;
   this.y = centerY;
   this.loneliness = 0;
-  this.loneRate = Math.random() * 1;
+  this.loneRate = Math.random();
   this.closeness = Math.floor(Math.random() * 100);
 
   this.neurons = [];
@@ -63,7 +63,7 @@ Dot.prototype.Think = function() {
 
   let newValues = [0, 0, 0, 0, 0];
 
-  for (let index = 0; index < this.neurons.length; index++) {
+  for (let index = 0; index < 2; index++) {
     for (
       let cindex = 0;
       cindex < this.neurons[index].connections.length;
@@ -97,9 +97,10 @@ Dot.prototype.Wrap = function() {
 };
 
 Dot.prototype.CheckDeath = function() {
-  if (this.NearWall() || this.loneliness > 1) {
-    this.Init();
-  }
+	return (this.NearWall() || this.loneliness > 1);
+//   if (this.NearWall() || this.loneliness > 1) {
+// 	this.Init();
+//   }
 };
 
 Dot.prototype.NearWall = function() {
@@ -119,7 +120,7 @@ Dot.prototype.NearDot = function() {
       Math.abs(this.x - otherDot.x) < this.closeness &&
       Math.abs(this.y - otherDot.y) < this.closeness
     ) {
-      this.loneliness -= this.loneRate;
+      this.loneliness = 0;
     }
   });
 
@@ -193,8 +194,21 @@ function init() {
 
 function DrawGrid() {
   for (let i = dotCount; i > 0; i--) {
-    dots[i].DoMovement();
+	dots[i].DoMovement();
+	if(dots[i].ticks > longestLife){
+		longestLife = dots[i].ticks;
+		oldestDot = i;
+	}	
   }
+
+  dots.forEach(dot => {
+	  if (dot.CheckDeath()) {
+		  dot = dots[oldestDot];
+		  dot.x = centerX;
+		  dot.y = centerY;
+		  dot.ticks = 0;
+	  }
+  });
 
   // clear screen
   pixels = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
