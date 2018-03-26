@@ -23,7 +23,7 @@ Dot.prototype.Init = function() {
   this.closeness = Math.floor(Math.random() * 100);
 
   this.neurons = [];
-  let neuronCount = 5;
+  let neuronCount = 7;
   for (let index = 0; index < neuronCount; index++) {
     this.neurons.push(new neuron(neuronCount));
   }
@@ -31,28 +31,27 @@ Dot.prototype.Init = function() {
 
 Dot.prototype.Think = function() {
   // mix in inputs.
-  // this.neurons[3].value = this.NearWall ? 1 : -1;
-  this.neurons[2].value = (centerX - this.x) / centerX;
-  this.neurons[3].value = (centerY - this.y) / centerY;
-  this.neurons[4].value = this.loneliness;
+  this.neurons[4].value = (centerX - this.x) / centerX;
+  this.neurons[5].value = (centerY - this.y) / centerY;
+  this.neurons[6].value = 1 / (1 + Math.exp(this.loneliness));
 
-  let newValues = [0, 0, 0, 0, 0];
+  let newValues = [0,0,0,0,0,0,0];
 
-  for (let index = 0; index < 2; index++) {
+  for (let index = 0; index < 7; index++) {
     for (
       let cindex = 0;
       cindex < this.neurons[index].connections.length;
       cindex++
     ) {
       newValues[index] +=
-        this.neurons[cindex].value *
-          this.neurons[index].connections[cindex].weight +
-        this.neurons[index].bias;
+        (this.neurons[cindex].value *
+          this.neurons[index].connections[cindex].weight);
     }
+    //newValues[index] += this.neurons[index].bias;
   }
 
   for (let index = 0; index < this.neurons.length; index++) {
-    this.neurons[index].value = Math.sin(newValues[index]);
+    this.neurons[index].value = 1 / (1 + Math.exp(newValues[index]));
   }
 };
 
@@ -72,10 +71,19 @@ Dot.prototype.Wrap = function() {
 };
 
 Dot.prototype.CheckDeath = function() {
-  return this.NearWall() || this.loneliness > 1;
-  //   if (this.NearWall() || this.loneliness > 1) {
-  // 	this.Init();
-  //   }
+  return this.NearWall() || this.SpeedCheck() !== 0;
+};
+
+Dot.prototype.SpeedCheck = function() {
+  if (Math.abs(this.vector.x) > 100 || Math.abs(this.vector.y) > 100) {
+    return 1;
+  }
+
+  if (Math.abs(this.vector.x) < 1 && Math.abs(this.vector.y) < 1) { 
+    return -1; 
+  }
+
+  return 0;
 };
 
 Dot.prototype.NearWall = function() {
@@ -95,12 +103,14 @@ Dot.prototype.NearDot = function() {
       Math.abs(this.x - otherDot.x) < this.closeness &&
       Math.abs(this.y - otherDot.y) < this.closeness
     ) {
-      this.loneliness = 0;
+      this.loneliness -= this.loneRate;
     }
   });
 
   this.loneliness += this.loneRate;
 };
+
+
 
 Dot.prototype.LimitSpeed = function() {
   if (this.vector.x > 1) {
@@ -118,12 +128,11 @@ Dot.prototype.LimitSpeed = function() {
 };
 
 Dot.prototype.DoMovement = function() {
-  const scale = 10;
   this.NearDot();
   this.Think();
 
-  this.vector.x = this.neurons[0].value / scale;
-  this.vector.y = this.neurons[1].value / scale;
+  this.vector.x += (this.neurons[0].value - this.neurons[1].value) ;
+  this.vector.y += (this.neurons[2].value - this.neurons[3].value) ;
 
   //this.LimitSpeed();
 

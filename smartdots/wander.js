@@ -6,7 +6,7 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 100;
+let dotCount = 1000;
 let oldestDot = 0;
 let longestLife = 0.000000001;
 let dots = [];
@@ -29,11 +29,16 @@ function DrawGrid() {
   }
 
   dots.forEach(dot => {
-    if (dot.CheckDeath()) {
+    if (dot.CheckDeath() === true) {
       dot = dots[oldestDot];
-      dot.x = centerX;
-      dot.y = centerY;
+      dot.neurons[Math.floor(Math.random() * 7)] = new neuron(7);
+      dot.x = Math.random() * ctx.canvas.width;
+      dot.y = Math.random() * ctx.canvas.height;
+      dot.vector.x = 0;
+      dot.vector.y = 0;
+      dot.loneliness = 0;
       dot.ticks = 0;
+      
     }
   });
 
