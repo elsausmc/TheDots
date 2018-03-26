@@ -31,7 +31,7 @@ function DrawGrid() {
   dots.forEach(dot => {
     if (dot.CheckDeath() === true) {
       dot = dots[oldestDot];
-      dot.neurons[Math.floor(Math.random() * 7)] = new neuron(7);
+      //dot.neurons[Math.floor(Math.random() * 7)] = new neuron(7);
       dot.x = Math.random() * ctx.canvas.width;
       dot.y = Math.random() * ctx.canvas.height;
       dot.vector.x = 0;

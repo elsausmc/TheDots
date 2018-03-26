@@ -79,9 +79,9 @@ Dot.prototype.SpeedCheck = function() {
     return 1;
   }
 
-  if (Math.abs(this.vector.x) < 1 && Math.abs(this.vector.y) < 1) { 
-    return -1; 
-  }
+  // if (Math.abs(this.vector.x) < 0.001 && Math.abs(this.vector.y) < 0.001) { 
+  //   return -1; 
+  // }
 
   return 0;
 };
