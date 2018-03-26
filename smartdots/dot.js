@@ -37,7 +37,7 @@ Dot.prototype.Think = function() {
 
   let newValues = [0,0,0,0,0,0,0];
 
-  for (let index = 0; index < 7; index++) {
+  for (let index = 0; index < 4; index++) {
     for (
       let cindex = 0;
       cindex < this.neurons[index].connections.length;
@@ -75,7 +75,7 @@ Dot.prototype.CheckDeath = function() {
 };
 
 Dot.prototype.SpeedCheck = function() {
-  if (Math.abs(this.vector.x) > 100 || Math.abs(this.vector.y) > 100) {
+  if (Math.abs(this.vector.x) > 100 && Math.abs(this.vector.y) > 100) {
     return 1;
   }
 
