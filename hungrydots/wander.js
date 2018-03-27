@@ -6,7 +6,7 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 1000;
+let dotCount = 100;
 let oldestDot = 0;
 let longestLife = 0.00000001;
 let dots = [];
@@ -74,7 +74,7 @@ function DrawGrid() {
       //dot.loneliness = 0;
       dot.life = 0;
 
-      dots[oldestDot].life = -3;
+      //dots[oldestDot].life = -10;  // oldest one dies
     }
   }
 
