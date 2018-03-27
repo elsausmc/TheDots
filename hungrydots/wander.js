@@ -6,7 +6,7 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 100;
+let dotCount = 1000;
 let oldestDot = 0;
 let longestLife = 0.00000001;
 let dots = [];
@@ -67,8 +67,8 @@ function DrawGrid() {
         ];
       randomConnection.weight += (Math.random() * 2 - 1) ;
 
-      dot.x =  Math.random() * ctx.canvas.width;
-      dot.y =  Math.random() * ctx.canvas.height;
+      dot.x = centerX;// Math.random() * ctx.canvas.width;
+      dot.y = centerY;// Math.random() * ctx.canvas.height;
       dot.vector.x = 0;
       dot.vector.y = 0;
       //dot.loneliness = 0;

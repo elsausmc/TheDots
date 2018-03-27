@@ -5,7 +5,7 @@ function Dot() {
   this.neurons = [];
   this.life = 0.005;
   this.tickRate = 0.001;
-  this.InputCount = 10;
+  this.InputCount = 8;
   this.nearestDot = null;
   this.Init();
 }
@@ -34,8 +34,8 @@ Dot.prototype.DoMovement = function() {
   const scale = 1;
   this.Think();
 
-  this.vector.x = (this.neurons[0].value - this.neurons[1].value) / scale;
-  this.vector.y = (this.neurons[2].value - this.neurons[3].value) / scale;
+  this.vector.x += (this.neurons[0].value - this.neurons[1].value) / scale;
+  this.vector.y += (this.neurons[2].value - this.neurons[3].value) / scale;
 
   this.x += this.vector.x;
   this.y += this.vector.y;
@@ -69,12 +69,12 @@ Dot.prototype.NearWall = function() {
 Dot.prototype.Think = function() {
   this.neurons[4].value = (centerX - this.x) / centerX;
   this.neurons[5].value = (centerY - this.y) / centerY;
-  this.neurons[6].value = this.life;
-  //this.neurons[7].value = this.vector.x;
-  //this.neurons[8].value = this.vector.y;
-  this.neurons[7].value = this.x - this.nearestDot.x;
-  this.neurons[8].value = this.y - this.nearestDot.y;
-  this.neurons[9].value = this.nearestDot.life - this.life;
+  //this.neurons[6].value = this.life;
+  this.neurons[6].value = this.vector.x;
+  this.neurons[7].value = this.vector.y;
+  //this.neurons[8].value = this.x - this.nearestDot.x;
+  //this.neurons[9].value = this.y - this.nearestDot.y;
+  //this.neurons[11].value = this.nearestDot.life;
 
   let newValues = [];
   for (let fillIndex = 0; fillIndex < this.InputCount; fillIndex++) {
