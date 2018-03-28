@@ -91,9 +91,9 @@ function DrawGrid() {
     let y = Math.floor(dot.y);
     index = (x + y * ctx.canvas.width) * 4;
     if (!(x < 0 || y < 0 || x > ctx.canvas.width || y > ctx.canvas.height)) {
-      pixels.data[index] = 255;
-      pixels.data[index + 1] = 255;
-      pixels.data[index + 2] = 255;
+      pixels.data[index] = dot.color.r;
+      pixels.data[index + 1] = dot.color.g;
+      pixels.data[index + 2] = dot.color.b;
       pixels.data[index + 3] = 255;
     }
   }

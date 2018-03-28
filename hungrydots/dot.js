@@ -1,10 +1,16 @@
 function Dot() {
   this.vector = { x: 0, y: 0 };
+  this.color = {
+    r: 127 + Math.floor(Math.random() * 127),
+    g: 127 + Math.floor(Math.random() * 127),
+    b: 127 + Math.floor(Math.random() * 127)
+  };
+  
   this.x = centerX;
   this.y = centerY;
   this.neurons = [];
   this.life = 1;
-  this.tickRate = 0.001;
+  this.tickRate = 0.005;
   this.InputCount = 9;
   this.nearestDot = null;
   this.Init();
