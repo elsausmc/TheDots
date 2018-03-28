@@ -67,16 +67,14 @@ function DrawGrid() {
         randomNeuron.connections[
           Math.floor(Math.random() * randomNeuron.connections.length)
         ];
-      randomConnection.weight += (Math.random() * 2 - 1) / 100;
+      randomConnection.weight += (Math.random() * 2 - 1) / 10;
 
       dot.x = Math.random() * ctx.canvas.width;
       dot.y = Math.random() * ctx.canvas.height;
       dot.vector.x = 0;
       dot.vector.y = 0;
-      //dot.loneliness = 0;
-      dot.life = 0;
+      dot.life = 1;
 
-      //dots[oldestDot].life = -10;  // oldest one dies
     }
   }
 

@@ -3,23 +3,29 @@ function Dot() {
   this.x = centerX;
   this.y = centerY;
   this.neurons = [];
-  this.life = 0.005;
+  this.life = 1;
   this.tickRate = 0.001;
-  this.InputCount = 11;
+  this.InputCount = 9;
   this.nearestDot = null;
   this.Init();
 }
 
 Dot.prototype.CheckDeath = function() {
-  return this.NearWall() || this.Consumed() || this.life < -2;
-  
+  return this.Consumed() || this.life < 0;
+  //this.NearWall() ||
 };
 
 Dot.prototype.Consumed = function() {
+
+  const dx = this.x - this.nearestDot.x;
+  const dy = this.y - this.nearestDot.y;
+  const distance = Math.abs(Math.sqrt(dx * dx + dy * dy));
+
   if (
-    this.life > 0.005 + (this.tickRate * 100) &&
-    Math.floor(this.x) === Math.floor(this.nearestDot.x) &&
-    Math.floor(this.y) === Math.floor(this.nearestDot.y) &&
+    //this.life > 0.005 + (this.tickRate * 10) &&
+    //Math.floor(this.x) === Math.floor(this.nearestDot.x) &&
+    //Math.floor(this.y) === Math.floor(this.nearestDot.y) &&
+    distance < 2 &&
     this.life < this.nearestDot.life
   ) {
     this.nearestDot.life += this.life;
@@ -39,7 +45,7 @@ Dot.prototype.DoMovement = function() {
 
   this.x += this.vector.x;
   this.y += this.vector.y;
-
+  this.Wrap();
   this.life -= this.tickRate; //+ (Math.sqrt((this.vector.x*this.vector.x) + (this.vector.y * this.vector.y))/100);
 };
 
@@ -64,14 +70,14 @@ Dot.prototype.NearWall = function() {
 };
 
 Dot.prototype.Think = function() {
-  this.neurons[4].value = (centerX - this.x) / centerX;
-  this.neurons[5].value = (centerY - this.y) / centerY;
+  //this.neurons[4].value = (centerX - this.x) / centerX;
+  //this.neurons[5].value = (centerY - this.y) / centerY;
   //this.neurons[6].value = this.life;
-  this.neurons[6].value = this.vector.x;
-  this.neurons[7].value = this.vector.y;
-  this.neurons[8].value = this.x - this.nearestDot.x;
-  this.neurons[9].value = this.y - this.nearestDot.y;
-  this.neurons[10].value = this.life - this.nearestDot.life;
+  this.neurons[4].value = this.vector.x;
+  this.neurons[5].value = this.vector.y;
+  this.neurons[6].value = this.x - this.nearestDot.x;
+  this.neurons[7].value = this.y - this.nearestDot.y;
+  this.neurons[8].value = this.life - this.nearestDot.life;
 
   let newValues = [];
   for (let fillIndex = 0; fillIndex < this.InputCount; fillIndex++) {
