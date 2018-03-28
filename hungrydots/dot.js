@@ -26,9 +26,9 @@ Dot.prototype.Consumed = function() {
     //Math.floor(this.x) === Math.floor(this.nearestDot.x) &&
     //Math.floor(this.y) === Math.floor(this.nearestDot.y) &&
     distance < 2 &&
-    this.life < this.nearestDot.life
+    this.life <= this.nearestDot.life
   ) {
-    this.nearestDot.life += this.life;
+    this.nearestDot.life += 0.5;
     this.life = 0;
     return true;
   }
@@ -46,7 +46,8 @@ Dot.prototype.DoMovement = function() {
   this.x += this.vector.x;
   this.y += this.vector.y;
   this.Wrap();
-  this.life -= this.tickRate; //+ (Math.sqrt((this.vector.x*this.vector.x) + (this.vector.y * this.vector.y))/100);
+  const lastVector = (Math.sqrt((this.vector.x*this.vector.x) + (this.vector.y * this.vector.y))/1000);
+  this.life -= lastVector + this.tickRate; 
 };
 
 Dot.prototype.Init = function() {
