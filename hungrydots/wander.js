@@ -67,7 +67,7 @@ function DrawGrid() {
         randomNeuron.connections[
           Math.floor(Math.random() * randomNeuron.connections.length)
         ];
-      randomConnection.weight += (Math.random() * 2 - 1) / 10;
+      randomConnection.weight += (Math.random() * 2 - 1) /1;
 
       dot.x = Math.random() * ctx.canvas.width;
       dot.y = Math.random() * ctx.canvas.height;

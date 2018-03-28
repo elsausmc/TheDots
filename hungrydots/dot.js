@@ -6,11 +6,13 @@ function Dot() {
     b: 127 + Math.floor(Math.random() * 127)
   };
   
-  this.x = centerX;
-  this.y = centerY;
+  //this.x = centerX;
+  //this.y = centerY;
+  this.x = Math.random() * ctx.canvas.width;
+  this.y = Math.random() * ctx.canvas.height;
   this.neurons = [];
   this.life = 1;
-  this.tickRate = 0.005;
+  this.tickRate = 0.001;
   this.InputCount = 9;
   this.nearestDot = null;
   this.Init();
