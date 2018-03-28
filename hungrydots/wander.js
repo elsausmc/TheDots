@@ -18,6 +18,7 @@ function Init() {
 
   DrawGrid();
 }
+
 function FindNearest(di) {
   let dot = dots[di];
   let smallestdistance = 100000;
@@ -52,10 +53,11 @@ function DrawGrid() {
     let dot = dots[dotIndex];
 
     if (dot.CheckDeath() === true) {
+      let randot = Math.floor(Math.random() * dots.length);
       for (let ni = 0; ni < dot.neurons.length; ni++) {
         for (let nc = 0; nc < dot.neurons[ni].connections.length; nc++) {
           dot.neurons[ni].connections[nc].weight =
-            dots[oldestDot].neurons[ni].connections[nc].weight;
+            dots[randot].neurons[ni].connections[nc].weight;
         }
       }
 
@@ -65,10 +67,10 @@ function DrawGrid() {
         randomNeuron.connections[
           Math.floor(Math.random() * randomNeuron.connections.length)
         ];
-      randomConnection.weight += (Math.random() * 2 - 1) ;
+      randomConnection.weight += (Math.random() * 2 - 1) / 100;
 
-      dot.x = centerX;// Math.random() * ctx.canvas.width;
-      dot.y = centerY;// Math.random() * ctx.canvas.height;
+      dot.x = Math.random() * ctx.canvas.width;
+      dot.y = Math.random() * ctx.canvas.height;
       dot.vector.x = 0;
       dot.vector.y = 0;
       //dot.loneliness = 0;
@@ -100,7 +102,7 @@ function DrawGrid() {
 
   ctx.putImageData(pixels, 0, 0);
 
-  setTimeout(function() {
+  setTimeout(function () {
     DrawGrid();
   }, 1);
   return;
