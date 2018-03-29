@@ -133,7 +133,7 @@ Dot.prototype.MutateNeuron = function(neurons) {
   let neuronConnections = neurons[neuronIndex].connections;
   let connectionIndex = Math.floor(Math.random() * neuronConnections.length);
   let randomConnection = neuronConnections[connectionIndex];
-  randomConnection.weight += (Math.random() * 2 - 1) / 10;
+  randomConnection.weight += (Math.random() * 2 - 1) / 1;
 };
 
 Dot.prototype.GetInputs = function() {
