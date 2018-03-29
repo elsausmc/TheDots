@@ -120,7 +120,7 @@ Dot.prototype.GetDistance = function(otherDot) {
 };
 
 Dot.prototype.MutateBrain = function() {
-  const layer = Math.floor(Math.random() * 1);
+  const layer = Math.floor(Math.random() * 2);
   if (layer === 0) {
     this.MutateNeuron(this.layer1);
   } else {
