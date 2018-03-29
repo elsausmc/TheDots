@@ -5,43 +5,94 @@ function Dot() {
     g: 127 + Math.floor(Math.random() * 127),
     b: 127 + Math.floor(Math.random() * 127)
   };
-  
-  //this.x = centerX;
-  //this.y = centerY;
-  this.x = Math.random() * ctx.canvas.width;
-  this.y = Math.random() * ctx.canvas.height;
-  this.neurons = [];
+
   this.life = 1;
   this.tickRate = 0.001;
-  this.InputCount = 9;
+
   this.nearestDot = null;
-  this.Init();
+  this.nearestFood = null;
+  this.x = Math.random() * ctx.canvas.width;
+  this.y = Math.random() * ctx.canvas.height;
+
+  // inputs
+  this.inputCount = 11;
+  this.inputs = new Array(this.inputCount).fill(0);
+
+  this.layer1Count = 10;
+  this.layer1 = [];
+
+  // hidden layer 1
+  for (let index = 0; index < this.layer1Count; index++) {
+    this.layer1.push(new neuron(this.inputCount));
+  }
+
+  // output
+  this.outputCount = 4;
+  this.neurons = [];
+  for (let index = 0; index < this.outputCount; index++) {
+    this.neurons.push(new neuron(this.layer1Count));
+  }
 }
+
+Dot.prototype.CheckDots = function(dots) {
+  let smallestdistance = 100000;
+
+  for (let closeIndex = 0; closeIndex < dots.length; closeIndex++) {
+    let checkDot = dots[closeIndex];
+    if (this != checkDot) {
+      // check closeness
+      const distance = this.GetDistance(checkDot);
+
+      if (closeIndex === 0 || distance < smallestdistance) {
+        smallestdistance = distance;
+        this.nearestDot = checkDot;
+        checkDot.nearestDot = this;
+
+        // check closest food
+        if (
+          this.nearestFood == null ||
+          checkDot.life <= this.nearestFood.life
+        ) {
+          this.nearestFood = checkDot;
+        }
+      }
+    }
+  }
+};
 
 Dot.prototype.CheckDeath = function() {
   return this.Consumed() || this.life < 0;
-  //this.NearWall() ||
 };
 
 Dot.prototype.Consumed = function() {
+  if (this.nearestDot != null) {
+    const dx = this.x - this.nearestDot.x;
+    const dy = this.y - this.nearestDot.y;
+    const distance = Math.abs(Math.sqrt(dx * dx + dy * dy));
 
-  const dx = this.x - this.nearestDot.x;
-  const dy = this.y - this.nearestDot.y;
-  const distance = Math.abs(Math.sqrt(dx * dx + dy * dy));
+    if (distance < 2 && this.life <= this.nearestDot.life) {
+      this.nearestDot.life += 0.5;
+      this.life = 0;
+      return true;
+    }
+  }
+  return false;
+};
 
-  if (
-    //this.life > 0.005 + (this.tickRate * 10) &&
-    //Math.floor(this.x) === Math.floor(this.nearestDot.x) &&
-    //Math.floor(this.y) === Math.floor(this.nearestDot.y) &&
-    distance < 2 &&
-    this.life <= this.nearestDot.life
-  ) {
-    this.nearestDot.life += 0.5;
-    this.life = 0;
-    return true;
+Dot.prototype.CopyBrain = function(randot) {
+  for (let ni = 0; ni < this.neurons.length; ni++) {
+    for (let nc = 0; nc < this.neurons[ni].connections.length; nc++) {
+      this.neurons[ni].connections[nc].weight =
+        randot.neurons[ni].connections[nc].weight;
+    }
   }
 
-  return false;
+  for (let ni = 0; ni < this.layer1.length; ni++) {
+    for (let nc = 0; nc < this.layer1[ni].connections.length; nc++) {
+      this.layer1[ni].connections[nc].weight =
+        randot.layer1[ni].connections[nc].weight;
+    }
+  }
 };
 
 Dot.prototype.DoMovement = function() {
@@ -53,74 +104,138 @@ Dot.prototype.DoMovement = function() {
 
   this.x += this.vector.x;
   this.y += this.vector.y;
-  this.Wrap();
-  const lastVector = (Math.sqrt((this.vector.x*this.vector.x) + (this.vector.y * this.vector.y))/1000);
-  this.life -= lastVector + this.tickRate; 
+  //// this.StopAtWall();
+  this.Bounce();
+  const lastVector =
+    Math.sqrt(this.vector.x * this.vector.x + this.vector.y * this.vector.y) /
+    100;
+  this.life -= lastVector; // + this.tickRate;
 };
 
-Dot.prototype.Init = function() {
-  this.x = centerX;
-  this.y = centerY;
+Dot.prototype.GetDistance = function(otherDot) {
+  const dx = this.x - otherDot.x;
+  const dy = this.y - otherDot.y;
+  const distance = Math.abs(Math.sqrt(dx * dx + dy * dy));
+  return distance;
+};
 
-  this.neurons = [];
-  for (let index = 0; index < this.InputCount; index++) {
-    this.neurons.push(new neuron(this.InputCount));
+Dot.prototype.MutateBrain = function() {
+  const layer = Math.floor(Math.random() * 1);
+  if (layer === 0) {
+    this.MutateNeuron(this.layer1);
+  } else {
+    this.MutateNeuron(this.neurons);
   }
 };
 
-Dot.prototype.NearWall = function() {
-  let padding = 10; // this.life * 100;
-  return (
-    this.x > ctx.canvas.width - padding ||
-    this.x < padding ||
-    this.y > ctx.canvas.height - padding ||
-    this.y < padding
-  );
+Dot.prototype.MutateNeuron = function(neurons) {
+  let neuronIndex = Math.floor(Math.random() * neurons.length);
+  let neuronConnections = neurons[neuronIndex].connections;
+  let connectionIndex = Math.floor(Math.random() * neuronConnections.length);
+  let randomConnection = neuronConnections[connectionIndex];
+  randomConnection.weight += (Math.random() * 2 - 1) / 10;
+};
+
+Dot.prototype.GetInputs = function() {
+  this.inputs = [];
+
+  // this.inputs.push(this.neurons[0].value);
+  // this.inputs.push(this.neurons[1].value);
+  // this.inputs.push(this.neurons[2].value);
+  // this.inputs.push(this.neurons[3].value);
+  this.inputs.push(this.vector.x);
+  this.inputs.push(this.vector.y);
+
+  this.inputs.push((centerX - this.x) / centerX);
+  this.inputs.push((centerY - this.y) / centerY);
+  this.inputs.push(this.life);
+
+  this.inputs.push(this.nearestDot.x - this.x);
+  this.inputs.push(this.nearestDot.y - this.y);
+  this.inputs.push(this.life - this.nearestDot.life);
+
+  this.inputs.push(this.nearestFood.x - this.x);
+  this.inputs.push(this.nearestFood.y - this.y);
+  this.inputs.push(this.life - this.nearestFood.life);
+};
+
+Dot.prototype.ProcessLayer1 = function() {
+  this.layer1.forEach(neuron => {
+    let inputValues = 0;
+    for (let ci = 0; ci < neuron.connections.length; ci++) {
+      inputValues += this.inputs[ci] * neuron.connections[ci].weight;
+    }
+    neuron.value = 1 / (1 + Math.exp(-inputValues));
+  });
+};
+
+Dot.prototype.ProcessOutput = function() {
+  this.neurons.forEach(neuron => {
+    let inputValues = 0;
+    for (let ci = 0; ci < neuron.connections.length; ci++) {
+      inputValues += this.layer1[ci].value * neuron.connections[ci].weight;
+    }
+    neuron.value = 1 / (1 + Math.exp(-inputValues));
+  });
 };
 
 Dot.prototype.Think = function() {
-  //this.neurons[4].value = (centerX - this.x) / centerX;
-  //this.neurons[5].value = (centerY - this.y) / centerY;
-  //this.neurons[6].value = this.life;
-  this.neurons[4].value = this.vector.x;
-  this.neurons[5].value = this.vector.y;
-  this.neurons[6].value = this.x - this.nearestDot.x;
-  this.neurons[7].value = this.y - this.nearestDot.y;
-  this.neurons[8].value = this.life - this.nearestDot.life;
+  this.GetInputs();
+  this.ProcessLayer1();
+  this.ProcessOutput();
+};
 
-  let newValues = [];
-  for (let fillIndex = 0; fillIndex < this.InputCount; fillIndex++) {
-    newValues.push(0);
+Dot.prototype.StopAtWall = function() {
+  if (this.x > ctx.canvas.width - 1) {
+    this.x = ctx.canvas.width - 1;
+    this.vector.x = 0;
   }
-
-  for (let index = 0; index < 4; index++) {
-    for (
-      let cindex = 0;
-      cindex < this.neurons[index].connections.length;
-      cindex++
-    ) {
-      newValues[index] +=
-        this.neurons[cindex].value *
-        this.neurons[index].connections[cindex].weight;
-    }
+  if (this.x < 0) {
+    this.x = 0;
+    this.vector.x = 0;
   }
+  if (this.y > ctx.canvas.height - 1) {
+    this.y = ctx.canvas.height - 1;
+    this.vector.y = 0;
+  }
+  if (this.y < 0) {
+    this.y = 0;
+    this.vector.y = 0;
+  }
+};
 
-  for (let index = 0; index < this.neurons.length; index++) {
-    this.neurons[index].value = 1 / (1 + Math.exp(newValues[index]));
+Dot.prototype.Bounce = function() {
+  // Bounce
+  var bounce = -0.5;
+  if (this.x > ctx.canvas.width - 1) {
+    this.x = ctx.canvas.width - 1;
+    this.vector.x *= bounce;
+  }
+  if (this.x < 0) {
+    this.x = 0;
+    this.vector.x *= bounce;
+  }
+  if (this.y > ctx.canvas.height - 1) {
+    this.y = ctx.canvas.height - 1;
+    this.vector.y *= bounce;
+  }
+  if (this.y < 0) {
+    this.y = 0;
+    this.vector.y *= bounce;
   }
 };
 
 Dot.prototype.Wrap = function() {
-  if (this.x > ctx.canvas.width) {
+  if (this.x > ctx.canvas.width - 1) {
     this.x = 0;
   }
   if (this.x < 0) {
-    this.x = ctx.canvas.width;
+    this.x = ctx.canvas.width - 1;
   }
-  if (this.y > ctx.canvas.height) {
+  if (this.y > ctx.canvas.height - 1) {
     this.y = 0;
   }
   if (this.y < 0) {
-    this.y = ctx.canvas.height;
+    this.y = ctx.canvas.height - 1;
   }
 };

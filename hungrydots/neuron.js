@@ -1,15 +1,11 @@
-function neuron(neuronCount) {
-  this.bias = Math.random() * 2 - 1;
-  this.connections = [];
+function neuron(connectionCount) {
+  //this.bias = Math.random() * 2 - 1;
   this.value = Math.random() * 2 - 1;
-  this.Init(neuronCount);
-}
 
-neuron.prototype.Init = function(connectionCount) {
+  this.connections = [];
   for (let index = 0; index < connectionCount; index++) {
     this.connections.push({
-      nindex: index,
       weight: Math.random() * 2 - 1
     });
   }
-};
+}
