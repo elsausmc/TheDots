@@ -12,10 +12,11 @@ function Dot() {
   this.y = Math.random() * ctx.canvas.height;
   this.neurons = [];
   this.life = 1;
-  this.tickRate = 0.001;
+  this.tickRate = 0.01;
   this.InputCount = 9;
   this.nearestDot = null;
   this.Init();
+  this.age = 0;
 }
 
 Dot.prototype.CheckDeath = function() {
@@ -34,9 +35,9 @@ Dot.prototype.Consumed = function() {
     //Math.floor(this.x) === Math.floor(this.nearestDot.x) &&
     //Math.floor(this.y) === Math.floor(this.nearestDot.y) &&
     distance < 2 &&
-    this.life <= this.nearestDot.life
+    this.age <= this.nearestDot.age
   ) {
-    this.nearestDot.life += 0.5;
+    this.nearestDot.life += 1;
     this.life = 0;
     return true;
   }
@@ -56,6 +57,7 @@ Dot.prototype.DoMovement = function() {
   this.Wrap();
   const lastVector = (Math.sqrt((this.vector.x*this.vector.x) + (this.vector.y * this.vector.y))/1000);
   this.life -= lastVector + this.tickRate; 
+  this.age++;
 };
 
 Dot.prototype.Init = function() {
@@ -86,7 +88,7 @@ Dot.prototype.Think = function() {
   this.neurons[5].value = this.vector.y;
   this.neurons[6].value = this.x - this.nearestDot.x;
   this.neurons[7].value = this.y - this.nearestDot.y;
-  this.neurons[8].value = this.life - this.nearestDot.life;
+  this.neurons[8].value = this.age - this.nearestDot.age;
 
   let newValues = [];
   for (let fillIndex = 0; fillIndex < this.InputCount; fillIndex++) {

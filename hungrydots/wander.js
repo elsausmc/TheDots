@@ -7,9 +7,15 @@ let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
 let dotCount = 1000;
-let oldestDot = 0;
-let longestLife = 0.00000001;
 let dots = [];
+
+let populationData = {
+  mostLife: 0,
+  highestAverage: 0,
+  averageAge: 0,
+  highestAge: 0,
+  oldestDot: 0
+};
 
 function Init() {
   for (let i = 0; i <= dotCount; i++) {
@@ -40,13 +46,25 @@ function FindNearest(di) {
 }
 
 function DrawGrid() {
+  let totalLife = 0;
   for (let i = 0; i < dotCount; i++) {
     FindNearest(i);
     dots[i].DoMovement();
-    if (dots[i].life > longestLife) {
-      longestLife = dots[i].life;
-      oldestDot = i;
+    totalLife += dots[i].life;
+    if (dots[i].life > populationData.mostLife) {
+      populationData.mostLife = dots[i].life;
     }
+
+    if (dots[i].age > populationData.highestAge) {
+      populationData.oldestDot = i;
+      populationData.highestAge = dots[i].age;
+    }
+
+  }
+
+  let averageLife = totalLife / dotCount;
+  if (averageLife > populationData.highestAverage) {
+    populationData.highestAverage = averageLife;
   }
 
   for (let dotIndex = 0; dotIndex < dots.length; dotIndex++) {
@@ -74,6 +92,7 @@ function DrawGrid() {
       dot.vector.x = 0;
       dot.vector.y = 0;
       dot.life = 1;
+      dot.age = 0;
 
     }
   }
@@ -91,14 +110,29 @@ function DrawGrid() {
     let y = Math.floor(dot.y);
     index = (x + y * ctx.canvas.width) * 4;
     if (!(x < 0 || y < 0 || x > ctx.canvas.width || y > ctx.canvas.height)) {
-      pixels.data[index] = dot.color.r;
-      pixels.data[index + 1] = dot.color.g;
-      pixels.data[index + 2] = dot.color.b;
+      let colorShift = dot.age / populationData.highestAge * 255;
+      if(i == populationData.oldestDot){
+        colorShift = 255;
+      }
+      pixels.data[index] = 255 - colorShift;
+      pixels.data[index + 1] = colorShift;
+      pixels.data[index + 2] = 0;
       pixels.data[index + 3] = 255;
     }
   }
 
   ctx.putImageData(pixels, 0, 0);
+
+  ctx.font = "10px Arial";
+  ctx.fillStyle = "white";
+  ctx.fillText(averageLife, 10, 40);
+  ctx.fillText(populationData.highestAverage, 10, 50);
+  ctx.fillText(populationData.mostLife, 10, 60);
+  ctx.fillText(populationData.highestAge, 10, 70);
+
+  ctx.fillText(dots[populationData.oldestDot].life, 10, 90);
+  ctx.fillText(dots[populationData.oldestDot].age, 10, 100);
+
 
   setTimeout(function () {
     DrawGrid();
