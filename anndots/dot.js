@@ -26,11 +26,19 @@ function Dot() {
     this.layer1.push(new neuron(this.inputCount));
   }
 
+  this.layer2Count = 10;
+  this.layer2 = [];
+
+  // hidden layer 1
+  for (let index = 0; index < this.layer2Count; index++) {
+    this.layer2.push(new neuron(this.layer1Count));
+  }
+
   // output
   this.outputCount = 4;
   this.neurons = [];
   for (let index = 0; index < this.outputCount; index++) {
-    this.neurons.push(new neuron(this.layer1Count));
+    this.neurons.push(new neuron(this.layer2Count));
   }
 }
 
@@ -61,7 +69,7 @@ Dot.prototype.CheckDots = function(dots) {
 };
 
 Dot.prototype.CheckDeath = function() {
-  return this.Consumed() || this.life < 0;
+  return this.Consumed() || this.life < 0 || this.WallDeath();
 };
 
 Dot.prototype.Consumed = function() {
@@ -80,17 +88,28 @@ Dot.prototype.Consumed = function() {
 };
 
 Dot.prototype.CopyBrain = function(randot) {
-  for (let ni = 0; ni < this.neurons.length; ni++) {
-    for (let nc = 0; nc < this.neurons[ni].connections.length; nc++) {
-      this.neurons[ni].connections[nc].weight =
-        randot.neurons[ni].connections[nc].weight;
-    }
-  }
 
+  // copy layer1
   for (let ni = 0; ni < this.layer1.length; ni++) {
     for (let nc = 0; nc < this.layer1[ni].connections.length; nc++) {
       this.layer1[ni].connections[nc].weight =
         randot.layer1[ni].connections[nc].weight;
+    }
+  }
+
+  // copy layer2
+  for (let ni = 0; ni < this.layer2.length; ni++) {
+    for (let nc = 0; nc < this.layer2[ni].connections.length; nc++) {
+      this.layer2[ni].connections[nc].weight =
+        randot.layer2[ni].connections[nc].weight;
+    }
+  }
+
+  // copy output
+  for (let ni = 0; ni < this.neurons.length; ni++) {
+    for (let nc = 0; nc < this.neurons[ni].connections.length; nc++) {
+      this.neurons[ni].connections[nc].weight =
+        randot.neurons[ni].connections[nc].weight;
     }
   }
 };
@@ -99,13 +118,13 @@ Dot.prototype.DoMovement = function() {
   const scale = 1;
   this.Think();
 
-  this.vector.x = (this.neurons[0].value - this.neurons[1].value) / scale;
-  this.vector.y = (this.neurons[2].value - this.neurons[3].value) / scale;
+  this.vector.x += (this.neurons[0].value - this.neurons[1].value) / scale;
+  this.vector.y += (this.neurons[2].value - this.neurons[3].value) / scale;
 
   this.x += this.vector.x;
   this.y += this.vector.y;
   //// this.StopAtWall();
-  this.Bounce();
+  ////this.Bounce();
   const lastVector =
     Math.sqrt(this.vector.x * this.vector.x + this.vector.y * this.vector.y) /
     100;
@@ -169,8 +188,8 @@ Dot.prototype.ProcessLayer1 = function() {
   });
 };
 
-Dot.prototype.ProcessOutput = function() {
-  this.neurons.forEach(neuron => {
+Dot.prototype.ProcessLayer2 = function() {
+  this.layer2.forEach(neuron => {
     let inputValues = 0;
     for (let ci = 0; ci < neuron.connections.length; ci++) {
       inputValues += this.layer1[ci].value * neuron.connections[ci].weight;
@@ -179,9 +198,20 @@ Dot.prototype.ProcessOutput = function() {
   });
 };
 
+Dot.prototype.ProcessOutput = function() {
+  this.neurons.forEach(neuron => {
+    let inputValues = 0;
+    for (let ci = 0; ci < neuron.connections.length; ci++) {
+      inputValues += this.layer2[ci].value * neuron.connections[ci].weight;
+    }
+    neuron.value = 1 / (1 + Math.exp(-inputValues));
+  });
+};
+
 Dot.prototype.Think = function() {
   this.GetInputs();
   this.ProcessLayer1();
+  this.ProcessLayer2();
   this.ProcessOutput();
 };
 
@@ -238,4 +268,13 @@ Dot.prototype.Wrap = function() {
   if (this.y < 0) {
     this.y = ctx.canvas.height - 1;
   }
+};
+
+Dot.prototype.WallDeath = function() {
+  return (
+    this.x > ctx.canvas.width - 1 ||
+    this.x < 0 ||
+    this.y > ctx.canvas.height - 1 ||
+    this.y < 0
+  );
 };
