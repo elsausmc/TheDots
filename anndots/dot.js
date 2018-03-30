@@ -88,7 +88,6 @@ Dot.prototype.Consumed = function() {
 };
 
 Dot.prototype.CopyBrain = function(randot) {
-
   // copy layer1
   for (let ni = 0; ni < this.layer1.length; ni++) {
     for (let nc = 0; nc < this.layer1[ni].connections.length; nc++) {
@@ -139,11 +138,18 @@ Dot.prototype.GetDistance = function(otherDot) {
 };
 
 Dot.prototype.MutateBrain = function() {
-  const layer = Math.floor(Math.random() * 2);
-  if (layer === 0) {
-    this.MutateNeuron(this.layer1);
-  } else {
-    this.MutateNeuron(this.neurons);
+  const layer = Math.floor(Math.random() * 3);
+  switch (layer) {
+    case 0:
+      this.MutateNeuron(this.layer1);
+      break;
+    case 1:
+      this.MutateNeuron(this.layer2);
+      break;
+
+    default:
+      this.MutateNeuron(this.neurons);
+      break;
   }
 };
 
@@ -152,7 +158,7 @@ Dot.prototype.MutateNeuron = function(neurons) {
   let neuronConnections = neurons[neuronIndex].connections;
   let connectionIndex = Math.floor(Math.random() * neuronConnections.length);
   let randomConnection = neuronConnections[connectionIndex];
-  randomConnection.weight += (Math.random() * 2 - 1) / 1;
+  randomConnection.weight += (Math.random() * 2 - 1) / 10;
 };
 
 Dot.prototype.GetInputs = function() {
