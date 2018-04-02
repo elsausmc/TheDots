@@ -28,7 +28,8 @@ function Init() {
 
 function DrawGrid() {
   let totalLife = 0;
-
+  populationData.highestAge = 0;
+  populationData.mostLife = 0;
   for (let i = 0; i < dotCount; i++) {
     totalLife += dots[i].life;
     dots[i].CheckDots(dots);
@@ -37,6 +38,7 @@ function DrawGrid() {
       populationData.mostLife = dots[i].life;
     }
 
+    
     if (dots[i].age > populationData.highestAge) {
       oldestDot = i;
       populationData.highestAge = dots[i].age;
@@ -52,7 +54,7 @@ function DrawGrid() {
     let dot = dots[dotIndex];
 
     if (dot.CheckDeath() === true) {
-      //// let randot = dots[Math.floor(Math.random() * dots.length)];
+      //let randot = dots[Math.floor(Math.random() * dots.length)];
 
       // oldest dot gets to keep it's brain and be given a new life.
       if (dot.age < populationData.highestAge) {
@@ -83,7 +85,7 @@ function DrawGrid() {
     index = (x + y * ctx.canvas.width) * 4;
     if (!(x < 0 || y < 0 || x > ctx.canvas.width || y > ctx.canvas.height)) {
       let colorShift = dot.age / populationData.highestAge * 255;
-      if(i == oldestDot){
+      if (i == oldestDot) {
         colorShift = 255;
       }
 
@@ -99,9 +101,8 @@ function DrawGrid() {
   ctx.font = "10px Arial";
   ctx.fillStyle = "white";
   ctx.fillText(averageLife, 10, 40);
-  ctx.fillText(populationData.highestAverage, 10, 50);
-  ctx.fillText(populationData.mostLife, 10, 60);
-  ctx.fillText(populationData.highestAge, 10, 70);
+  ctx.fillText(populationData.mostLife, 10, 50);
+  ctx.fillText(populationData.highestAge, 10, 60);
 
   setTimeout(function() {
     DrawGrid();

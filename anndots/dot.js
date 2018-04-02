@@ -15,10 +15,10 @@ function Dot() {
   this.y = Math.random() * ctx.canvas.height;
 
   // inputs
-  this.inputCount = 6;
+  this.inputCount = 17;
   this.inputs = new Array(this.inputCount).fill(0);
 
-  this.layer1Count = 10;
+  this.layer1Count = 6;
   this.layer1 = [];
 
   // hidden layer 1
@@ -26,7 +26,7 @@ function Dot() {
     this.layer1.push(new neuron(this.inputCount));
   }
 
-  this.layer2Count = 10;
+  this.layer2Count = 6;
   this.layer2 = [];
 
   // hidden layer 1
@@ -78,7 +78,7 @@ Dot.prototype.Consumed = function() {
     const dy = this.y - this.nearestDot.y;
     const distance = Math.abs(Math.sqrt(dx * dx + dy * dy));
 
-    if (distance < 1 && this.life <= this.nearestDot.life) {
+    if (distance < 1 && this.age <= this.nearestDot.age) {
       this.nearestDot.life += 1;
       this.life = 0;
       return true;
@@ -114,11 +114,11 @@ Dot.prototype.CopyBrain = function(otherDot) {
 };
 
 Dot.prototype.DoMovement = function() {
-  const scale = 1;
+  //const scale = 1;
   this.Think();
 
-  this.vector.x += (this.neurons[0].value - this.neurons[1].value) / scale;
-  this.vector.y += (this.neurons[2].value - this.neurons[3].value) / scale;
+  this.vector.x += (this.neurons[0].value - this.neurons[1].value) ;
+  this.vector.y += (this.neurons[2].value - this.neurons[3].value) ;
 
   this.x += this.vector.x;
   this.y += this.vector.y;
@@ -127,7 +127,7 @@ Dot.prototype.DoMovement = function() {
   const lastVector =
     Math.sqrt(this.vector.x * this.vector.x + this.vector.y * this.vector.y) /
     1000;
-  this.life -= lastVector; // + this.tickRate;
+  this.life -= lastVector + this.tickRate;
   this.age++;
 };
 
@@ -139,19 +139,22 @@ Dot.prototype.GetDistance = function(otherDot) {
 };
 
 Dot.prototype.MutateBrain = function() {
-  const layer = Math.floor(Math.random() * 3);
-  switch (layer) {
-    case 0:
-      this.MutateNeuron(this.layer1);
-      break;
-    case 1:
-      this.MutateNeuron(this.layer2);
-      break;
+  // const layer = Math.floor(Math.random() * 3);
+  // switch (layer) {
+  //   case 0:
+  //     this.MutateNeuron(this.layer1);
+  //     break;
+  //   case 1:
+  //     this.MutateNeuron(this.layer2);
+  //     break;
 
-    default:
-      this.MutateNeuron(this.neurons);
-      break;
-  }
+  //   default:
+  //     this.MutateNeuron(this.neurons);
+  //     break;
+  // }
+  this.MutateNeuron(this.layer1);
+  this.MutateNeuron(this.layer2);
+  this.MutateNeuron(this.neurons);
 };
 
 Dot.prototype.MutateNeuron = function(neurons) {
@@ -159,30 +162,32 @@ Dot.prototype.MutateNeuron = function(neurons) {
   let neuronConnections = neurons[neuronIndex].connections;
   let connectionIndex = Math.floor(Math.random() * neuronConnections.length);
   let randomConnection = neuronConnections[connectionIndex];
-  randomConnection.weight += (Math.random() * 2 - 1) / 100;
+  randomConnection.weight += (Math.random() * 2 - 1) / 1000;
 };
 
 Dot.prototype.GetInputs = function() {
   this.inputs = [];
 
-   //this.inputs.push(this.neurons[0].value);
-   //this.inputs.push(this.neurons[1].value);
-   //this.inputs.push(this.neurons[2].value);
-   //this.inputs.push(this.neurons[3].value);
-  //this.inputs.push(this.vector.x);
-  //this.inputs.push(this.vector.y);
+  this.inputs.push(this.neurons[0].value);
+  this.inputs.push(this.neurons[1].value);
+  this.inputs.push(this.neurons[2].value);
+  this.inputs.push(this.neurons[3].value);
+  this.inputs.push(this.vector.x);
+  this.inputs.push(this.vector.y);
 
   this.inputs.push((centerX - this.x) / centerX);
   this.inputs.push((centerY - this.y) / centerY);
+  this.inputs.push(this.age);
   this.inputs.push(this.life);
 
   this.inputs.push(this.nearestDot.x - this.x);
   this.inputs.push(this.nearestDot.y - this.y);
-  this.inputs.push(this.life - this.nearestDot.life);
+  this.inputs.push(this.age - this.nearestDot.age);
+  this.inputs.push(this.nearestDot.life);
 
-  //this.inputs.push(this.nearestFood.x - this.x);
-  //this.inputs.push(this.nearestFood.y - this.y);
-  //this.inputs.push(this.life - this.nearestFood.life);
+  this.inputs.push(this.nearestFood.x - this.x);
+  this.inputs.push(this.nearestFood.y - this.y);
+  this.inputs.push(this.nearestFood.life);
 };
 
 Dot.prototype.ProcessLayer1 = function() {
@@ -191,7 +196,7 @@ Dot.prototype.ProcessLayer1 = function() {
     for (let ci = 0; ci < neuron.connections.length; ci++) {
       inputValues += this.inputs[ci] * neuron.connections[ci].weight;
     }
-    neuron.value = 1 / (1 + Math.exp(-inputValues));
+    neuron.value = 1 / (1 + Math.exp(-inputValues))- 0.5;
   });
 };
 
@@ -201,7 +206,7 @@ Dot.prototype.ProcessLayer2 = function() {
     for (let ci = 0; ci < neuron.connections.length; ci++) {
       inputValues += this.layer1[ci].value * neuron.connections[ci].weight;
     }
-    neuron.value = 1 / (1 + Math.exp(-inputValues));
+    neuron.value = 1 / (1 + Math.exp(-inputValues)) - 0.5;
   });
 };
 
@@ -211,7 +216,7 @@ Dot.prototype.ProcessOutput = function() {
     for (let ci = 0; ci < neuron.connections.length; ci++) {
       inputValues += this.layer2[ci].value * neuron.connections[ci].weight;
     }
-    neuron.value = 1 / (1 + Math.exp(-inputValues));
+    neuron.value = 1 / (1 + Math.exp(-inputValues))- 0.5;
   });
 };
 
