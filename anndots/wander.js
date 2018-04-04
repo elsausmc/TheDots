@@ -38,7 +38,6 @@ function DrawGrid() {
       populationData.mostLife = dots[i].life;
     }
 
-    
     if (dots[i].age > populationData.highestAge) {
       oldestDot = i;
       populationData.highestAge = dots[i].age;
@@ -54,16 +53,26 @@ function DrawGrid() {
     let dot = dots[dotIndex];
 
     if (dot.CheckDeath() === true) {
+      let copyDot = oldestDot;
+      if (Math.random() < 0.25) {
+        copyDot = Math.floor(Math.random() * dots.length);
+      }
       //let randot = dots[Math.floor(Math.random() * dots.length)];
 
       // oldest dot gets to keep it's brain and be given a new life.
-      if (dot.age < populationData.highestAge) {
-        dot.CopyBrain(dots[oldestDot]);
+      //if (dot.age < populationData.highestAge) {
+        dot.CopyBrain(dots[copyDot]);
         dot.MutateBrain();
-      }
+      //}
+
+      // put baby in a box
+      //const boxSize = 50;
+      //dot.x = (centerX-(boxSize /2)) + (Math.random() * boxSize);
+      //dot.y = (centerY-(boxSize /2)) + (Math.random() * boxSize);
 
       dot.x = Math.random() * ctx.canvas.width;
       dot.y = Math.random() * ctx.canvas.height;
+
       dot.vector.x = 0;
       dot.vector.y = 0;
       dot.life = 1;

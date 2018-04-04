@@ -6,8 +6,8 @@ function Dot() {
     b: 127 + Math.floor(Math.random() * 127)
   };
   this.age = 0;
-  this.life = 1;
-  this.tickRate = 0.001;
+  this.life = Math.random();
+  this.tickRate = 0.005;
 
   this.nearestDot = null;
   this.nearestFood = null;
@@ -78,9 +78,9 @@ Dot.prototype.Consumed = function() {
     const dy = this.y - this.nearestDot.y;
     const distance = Math.abs(Math.sqrt(dx * dx + dy * dy));
 
-    if (distance < 1 && this.age <= this.nearestDot.age) {
+    if (distance < 5 + (this.nearestDot.age / 10000) && this.age <= this.nearestDot.age) {
       this.nearestDot.life += 1;
-      this.life = 0;
+      this.life = -1;
       return true;
     }
   }
@@ -92,7 +92,7 @@ Dot.prototype.CopyBrain = function(otherDot) {
   for (let ni = 0; ni < this.layer1.length; ni++) {
     for (let nc = 0; nc < this.layer1[ni].connections.length; nc++) {
       this.layer1[ni].connections[nc].weight =
-      otherDot.layer1[ni].connections[nc].weight;
+        otherDot.layer1[ni].connections[nc].weight;
     }
   }
 
@@ -100,7 +100,7 @@ Dot.prototype.CopyBrain = function(otherDot) {
   for (let ni = 0; ni < this.layer2.length; ni++) {
     for (let nc = 0; nc < this.layer2[ni].connections.length; nc++) {
       this.layer2[ni].connections[nc].weight =
-      otherDot.layer2[ni].connections[nc].weight;
+        otherDot.layer2[ni].connections[nc].weight;
     }
   }
 
@@ -108,17 +108,17 @@ Dot.prototype.CopyBrain = function(otherDot) {
   for (let ni = 0; ni < this.neurons.length; ni++) {
     for (let nc = 0; nc < this.neurons[ni].connections.length; nc++) {
       this.neurons[ni].connections[nc].weight =
-      otherDot.neurons[ni].connections[nc].weight;
+        otherDot.neurons[ni].connections[nc].weight;
     }
   }
 };
 
 Dot.prototype.DoMovement = function() {
-  //const scale = 1;
+  const scale = 1;
   this.Think();
 
-  this.vector.x += (this.neurons[0].value - this.neurons[1].value) ;
-  this.vector.y += (this.neurons[2].value - this.neurons[3].value) ;
+  this.vector.x += (this.neurons[0].value - this.neurons[1].value) / scale;
+  this.vector.y += (this.neurons[2].value - this.neurons[3].value) / scale;
 
   this.x += this.vector.x;
   this.y += this.vector.y;
@@ -139,22 +139,22 @@ Dot.prototype.GetDistance = function(otherDot) {
 };
 
 Dot.prototype.MutateBrain = function() {
-  // const layer = Math.floor(Math.random() * 3);
-  // switch (layer) {
-  //   case 0:
-  //     this.MutateNeuron(this.layer1);
-  //     break;
-  //   case 1:
-  //     this.MutateNeuron(this.layer2);
-  //     break;
+  const layer = Math.floor(Math.random() * 3);
+  switch (layer) {
+    case 0:
+      this.MutateNeuron(this.layer1);
+      break;
+    case 1:
+      this.MutateNeuron(this.layer2);
+      break;
 
-  //   default:
-  //     this.MutateNeuron(this.neurons);
-  //     break;
-  // }
-  this.MutateNeuron(this.layer1);
-  this.MutateNeuron(this.layer2);
-  this.MutateNeuron(this.neurons);
+    default:
+      this.MutateNeuron(this.neurons);
+      break;
+  }
+  // this.MutateNeuron(this.layer1);
+  // this.MutateNeuron(this.layer2);
+  // this.MutateNeuron(this.neurons);
 };
 
 Dot.prototype.MutateNeuron = function(neurons) {
@@ -162,7 +162,7 @@ Dot.prototype.MutateNeuron = function(neurons) {
   let neuronConnections = neurons[neuronIndex].connections;
   let connectionIndex = Math.floor(Math.random() * neuronConnections.length);
   let randomConnection = neuronConnections[connectionIndex];
-  randomConnection.weight += (Math.random() * 2 - 1) / 1000;
+  randomConnection.weight += (Math.random() * 2 - 1);
 };
 
 Dot.prototype.GetInputs = function() {
@@ -196,7 +196,7 @@ Dot.prototype.ProcessLayer1 = function() {
     for (let ci = 0; ci < neuron.connections.length; ci++) {
       inputValues += this.inputs[ci] * neuron.connections[ci].weight;
     }
-    neuron.value = 1 / (1 + Math.exp(-inputValues))- 0.5;
+    neuron.value = 1 / (1 + Math.exp(-inputValues)) - 0.5;
   });
 };
 
@@ -216,7 +216,7 @@ Dot.prototype.ProcessOutput = function() {
     for (let ci = 0; ci < neuron.connections.length; ci++) {
       inputValues += this.layer2[ci].value * neuron.connections[ci].weight;
     }
-    neuron.value = 1 / (1 + Math.exp(-inputValues))- 0.5;
+    neuron.value = 1 / (1 + Math.exp(-inputValues)) - 0.5;
   });
 };
 
