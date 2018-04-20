@@ -39,7 +39,7 @@ function DrawGrid() {
       }
 
       // dot = dots[oldestDot];
-      dot.neurons[Math.floor(Math.random() * 4)].connections[Math.floor(Math.random() * 7)].weight += ((Math.random() * 3) - 1)/ 1000;
+      dot.neurons[Math.floor(Math.random() * 4)].connections[Math.floor(Math.random() * 7)].weight += ((Math.random() * 3) - 1) / 1000;
       dot.x = Math.random() * ctx.canvas.width;
       dot.y = Math.random() * ctx.canvas.height;
       dot.vector.x = 0;

@@ -15,7 +15,7 @@ function Dot() {
   this.y = Math.random() * ctx.canvas.height;
 
   // inputs
-  this.inputCount = 17;
+  this.inputCount = 20;
   this.inputs = new Array(this.inputCount).fill(0);
 
   this.layer1Count = 6;
@@ -69,7 +69,7 @@ Dot.prototype.CheckDots = function(dots) {
 };
 
 Dot.prototype.CheckDeath = function() {
-  return this.Consumed() || this.life < 0 || this.WallDeath();
+  return  this.Consumed() || this.life < 0 || this.WallDeath();
 };
 
 Dot.prototype.Consumed = function() {
@@ -78,7 +78,7 @@ Dot.prototype.Consumed = function() {
     const dy = this.y - this.nearestDot.y;
     const distance = Math.abs(Math.sqrt(dx * dx + dy * dy));
 
-    if (distance < 5 + (this.nearestDot.age / 10000) && this.age <= this.nearestDot.age) {
+    if (distance < 5 && this.age <= this.nearestDot.age) {
       this.nearestDot.life += 1;
       this.life = -1;
       return true;
@@ -172,21 +172,27 @@ Dot.prototype.GetInputs = function() {
   this.inputs.push(this.neurons[1].value);
   this.inputs.push(this.neurons[2].value);
   this.inputs.push(this.neurons[3].value);
-  this.inputs.push(this.vector.x);
-  this.inputs.push(this.vector.y);
+  
 
   this.inputs.push((centerX - this.x) / centerX);
   this.inputs.push((centerY - this.y) / centerY);
+
+  this.inputs.push(this.x);
+  this.inputs.push(this.y);
   this.inputs.push(this.age);
   this.inputs.push(this.life);
 
-  this.inputs.push(this.nearestDot.x - this.x);
-  this.inputs.push(this.nearestDot.y - this.y);
-  this.inputs.push(this.age - this.nearestDot.age);
+  this.inputs.push(this.vector.x);
+  this.inputs.push(this.vector.y);
+
+  this.inputs.push(this.nearestDot.x);
+  this.inputs.push(this.nearestDot.y);
+  this.inputs.push(this.nearestDot.age);
   this.inputs.push(this.nearestDot.life);
 
-  this.inputs.push(this.nearestFood.x - this.x);
-  this.inputs.push(this.nearestFood.y - this.y);
+  this.inputs.push(this.nearestFood.x);
+  this.inputs.push(this.nearestFood.y);
+  this.inputs.push(this.nearestFood.age);
   this.inputs.push(this.nearestFood.life);
 };
 
