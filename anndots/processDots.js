@@ -21,6 +21,9 @@ let dots = [];
 function Init() {
   for (let i = 0; i <= dotCount; i++) {
     dots.push(new Dot());
+    if (i < dotCount / 2) {
+      dots[0].RestoreBrain();
+    }
   }
 
   DrawGrid();
@@ -53,22 +56,17 @@ function DrawGrid() {
     let dot = dots[dotIndex];
 
     if (dot.CheckDeath() === true) {
+      if (dot.age < populationData.highestAge) {
+        dot.SaveBrain();
+      }
+
       let copyDot = oldestDot;
-      if (Math.random() < 0.25) {
+      if (Math.random() < 0.9) {
         copyDot = Math.floor(Math.random() * dots.length);
       }
-      //let randot = dots[Math.floor(Math.random() * dots.length)];
 
-      // oldest dot gets to keep it's brain and be given a new life.
-      //if (dot.age < populationData.highestAge) {
-        dot.CopyBrain(dots[copyDot]);
-        dot.MutateBrain();
-      //}
-
-      // put baby in a box
-      //const boxSize = 50;
-      //dot.x = (centerX-(boxSize /2)) + (Math.random() * boxSize);
-      //dot.y = (centerY-(boxSize /2)) + (Math.random() * boxSize);
+      dot.CopyBrain(dots[copyDot]);
+      dot.MutateBrain();
 
       dot.x = Math.random() * ctx.canvas.width;
       dot.y = Math.random() * ctx.canvas.height;
@@ -94,12 +92,12 @@ function DrawGrid() {
     index = (x + y * ctx.canvas.width) * 4;
     if (!(x < 0 || y < 0 || x > ctx.canvas.width || y > ctx.canvas.height)) {
       let colorShift = dot.age / populationData.highestAge * 255;
-      if (i == oldestDot) {
+      if (i === oldestDot) {
         colorShift = 255;
       }
 
-      pixels.data[index] = 255 - colorShift;
-      pixels.data[index + 1] = colorShift;
+      pixels.data[index] = colorShift;
+      pixels.data[index + 1] = 255 - colorShift;
       pixels.data[index + 2] = 0;
       pixels.data[index + 3] = 255;
     }
@@ -109,9 +107,9 @@ function DrawGrid() {
 
   ctx.font = "10px Arial";
   ctx.fillStyle = "white";
-  ctx.fillText(averageLife, 10, 40);
-  ctx.fillText(populationData.mostLife, 10, 50);
-  ctx.fillText(populationData.highestAge, 10, 60);
+  ctx.fillText("average energy: " + averageLife.toFixed(3), 10, 40);
+  ctx.fillText("most energy: " + populationData.mostLife.toFixed(3), 10, 50);
+  ctx.fillText("oldest age: " + populationData.highestAge, 10, 60);
 
   setTimeout(function() {
     DrawGrid();
