@@ -21,8 +21,8 @@ let dots = [];
 function Init() {
   for (let i = 0; i <= dotCount; i++) {
     dots.push(new Dot());
-    if (i < dotCount / 2) {
-      dots[0].RestoreBrain();
+    if (i < dotCount * 0.5) {
+      dots[i].RestoreBrain();
     }
   }
 
@@ -61,7 +61,7 @@ function DrawGrid() {
       }
 
       let copyDot = oldestDot;
-      if (Math.random() < 0.9) {
+      if (Math.random() < 0.5) {
         copyDot = Math.floor(Math.random() * dots.length);
       }
 
@@ -89,17 +89,26 @@ function DrawGrid() {
     dot = dots[i];
     let x = Math.floor(dot.x);
     let y = Math.floor(dot.y);
-    index = (x + y * ctx.canvas.width) * 4;
-    if (!(x < 0 || y < 0 || x > ctx.canvas.width || y > ctx.canvas.height)) {
-      let colorShift = dot.age / populationData.highestAge * 255;
-      if (i === oldestDot) {
-        colorShift = 255;
-      }
 
-      pixels.data[index] = colorShift;
-      pixels.data[index + 1] = 255 - colorShift;
-      pixels.data[index + 2] = 0;
-      pixels.data[index + 3] = 255;
+    let colorShift = dot.age / populationData.highestAge * 255;
+    let dotSize = 1;
+    if (i === oldestDot) {
+      colorShift = 255;
+      dotSize += 2;
+    }
+
+    for (let xx = x - dotSize; xx <= x + dotSize; xx++) {
+      for (let yy = y - dotSize; yy <= y + dotSize; yy++) {
+        index = (xx + yy * ctx.canvas.width) * 4;
+        if (
+          !(xx < 0 || yy < 0 || xx > ctx.canvas.width || yy > ctx.canvas.height)
+        ) {
+          pixels.data[index] = dot.color.r; //colorShift;
+          pixels.data[index + 1] = dot.color.g; //255 - colorShift;
+          pixels.data[index + 2] = dot.color.b; //0;
+          pixels.data[index + 3] = 255;
+        }
+      }
     }
   }
 
