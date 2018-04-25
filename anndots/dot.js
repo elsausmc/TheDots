@@ -7,14 +7,14 @@ class Dot {
       b: Math.floor(Math.random() * 256) //127 + Math.floor(Math.random() * 127)
     };
     this.age = 0;
-    this.life = Math.random();
+    this.life = Math.random()*10;
     this.tickRate = 0.01;
     this.nearestDot = null;
     this.nearestFood = null;
     this.x = Math.random() * ctx.canvas.width;
     this.y = Math.random() * ctx.canvas.height;
     // inputs
-    this.inputCount = 18;
+    this.inputCount = 15;
     this.inputs = new Array(this.inputCount).fill(0);
     this.layer1Count = 6;
     this.layer1 = [];
@@ -69,7 +69,8 @@ class Dot {
         if (closeIndex === 0 || distance < smallestdistance) {
           smallestdistance = distance;
           this.nearestDot = checkDot;
-          checkDot.nearestDot = this;
+          //checkDot.nearestDot = this;
+
           // check closest food
           if (
             this.nearestFood === null ||
@@ -89,7 +90,7 @@ class Dot {
       const dx = this.x - this.nearestDot.x;
       const dy = this.y - this.nearestDot.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance < 5 && this.age <= this.nearestDot.age) {
+      if (distance < 5 && this.life <= this.nearestDot.life) {
         this.nearestDot.life += 1;
         this.life = -1;
         return true;
@@ -127,7 +128,9 @@ class Dot {
     this.x += this.vector.x;
     this.y += this.vector.y;
 
-    const lastVector = Math.sqrt(this.vector.x * this.vector.x + this.vector.y * this.vector.y) / 1000;
+    const lastVector =
+      Math.sqrt(this.vector.x * this.vector.x + this.vector.y * this.vector.y) /
+      1000;
     this.life -= this.tickRate + lastVector;
     this.age++;
   }
@@ -143,20 +146,20 @@ class Dot {
     this.inputs.push({ value: this.outputLayer[1].value });
     this.inputs.push({ value: (centerX - this.x) / centerX });
     this.inputs.push({ value: (centerY - this.y) / centerY });
+    
     this.inputs.push({ value: this.x });
     this.inputs.push({ value: this.y });
-    this.inputs.push({ value: this.age });
     this.inputs.push({ value: this.life });
     this.inputs.push({ value: this.vector.x });
     this.inputs.push({ value: this.vector.y });
-    this.inputs.push({ value: this.nearestDot.x });
-    this.inputs.push({ value: this.nearestDot.y });
-    this.inputs.push({ value: this.nearestDot.age });
-    this.inputs.push({ value: this.nearestDot.life });
-    this.inputs.push({ value: this.nearestFood.x });
-    this.inputs.push({ value: this.nearestFood.y });
-    this.inputs.push({ value: this.nearestFood.age });
-    this.inputs.push({ value: this.nearestFood.life });
+
+    this.inputs.push({ value: this.nearestDot.x - this.x });
+    this.inputs.push({ value: this.nearestDot.y - this.y });
+    this.inputs.push({ value: this.nearestDot.life - this.life });
+
+    this.inputs.push({ value: this.nearestFood.x - this.x });
+    this.inputs.push({ value: this.nearestFood.y - this.y });
+    this.inputs.push({ value: this.nearestFood.life - this.life });
   }
   MutateBrain() {
     const layer = Math.floor(Math.random() * 3);
@@ -192,9 +195,15 @@ class Dot {
   RestoreBrain() {
     var oldBrain = JSON.parse(localStorage.getItem("BrainSave"));
     if (oldBrain !== null) {
-      this.layer1 = oldBrain[0];
-      this.layer2 = oldBrain[1];
-      this.outputLayer = oldBrain[2];
+      if (
+        this.layer1[0].connections.length === oldBrain[0][0].connections.length &&
+        this.layer2[0].connections.length === oldBrain[1][0].connections.length &&
+        this.outputLayer[0].connections.length === oldBrain[2][0].connections.length
+      ) {
+        this.layer1 = oldBrain[0];
+        this.layer2 = oldBrain[1];
+        this.outputLayer = oldBrain[2];
+      }
     }
   }
   SaveBrain() {

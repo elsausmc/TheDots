@@ -6,7 +6,7 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 1000;
+let dotCount = 250;
 let oldestDot = 0;
 let highestAge = 0;
 let populationData = {
@@ -36,6 +36,7 @@ function DrawGrid() {
   for (let i = 0; i < dotCount; i++) {
     totalLife += dots[i].life;
     dots[i].CheckDots(dots);
+
     dots[i].DoMovement();
     if (dots[i].life > populationData.mostLife) {
       populationData.mostLife = dots[i].life;
@@ -56,14 +57,14 @@ function DrawGrid() {
     let dot = dots[dotIndex];
 
     if (dot.CheckDeath() === true) {
-      if (dot.age < populationData.highestAge) {
+      if (dot.age >= populationData.highestAge) {
         dot.SaveBrain();
       }
 
       let copyDot = oldestDot;
-      if (Math.random() < 0.5) {
-        copyDot = Math.floor(Math.random() * dots.length);
-      }
+      // if (Math.random() < 0.5) {
+      //   copyDot = Math.floor(Math.random() * dots.length);
+      // }
 
       dot.CopyBrain(dots[copyDot]);
       dot.MutateBrain();
@@ -73,7 +74,7 @@ function DrawGrid() {
 
       dot.vector.x = 0;
       dot.vector.y = 0;
-      dot.life = 1;
+      dot.life = 10;
       dot.age = 0;
     }
   }
