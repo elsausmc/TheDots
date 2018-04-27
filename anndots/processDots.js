@@ -6,7 +6,7 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 250;
+let dotCount = 200;
 let oldestDot = 0;
 let highestAge = 0;
 let populationData = {
@@ -62,9 +62,9 @@ function DrawGrid() {
       }
 
       let copyDot = oldestDot;
-      // if (Math.random() < 0.5) {
-      //   copyDot = Math.floor(Math.random() * dots.length);
-      // }
+      if (Math.random() < 0.5) {
+        copyDot = Math.floor(Math.random() * dots.length);
+      }
 
       dot.CopyBrain(dots[copyDot]);
       dot.MutateBrain();

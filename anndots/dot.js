@@ -14,7 +14,7 @@ class Dot {
     this.x = Math.random() * ctx.canvas.width;
     this.y = Math.random() * ctx.canvas.height;
     // inputs
-    this.inputCount = 15;
+    this.inputCount = 13;
     this.inputs = new Array(this.inputCount).fill(0);
     this.layer1Count = 6;
     this.layer1 = [];
@@ -144,8 +144,8 @@ class Dot {
     this.inputs = [];
     this.inputs.push({ value: this.outputLayer[0].value });
     this.inputs.push({ value: this.outputLayer[1].value });
-    this.inputs.push({ value: (centerX - this.x) / centerX });
-    this.inputs.push({ value: (centerY - this.y) / centerY });
+    //this.inputs.push({ value: (centerX - this.x) / centerX });
+    //this.inputs.push({ value: (centerY - this.y) / centerY });
     
     this.inputs.push({ value: this.x });
     this.inputs.push({ value: this.y });
