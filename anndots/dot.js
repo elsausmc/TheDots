@@ -7,7 +7,7 @@ class Dot {
       b: Math.floor(Math.random() * 256) //127 + Math.floor(Math.random() * 127)
     };
     this.age = 0;
-    this.life = Math.random()*10;
+    this.life = Math.random() * 10;
     this.tickRate = 0.01;
     this.nearestDot = null;
     this.nearestFood = null;
@@ -59,24 +59,29 @@ class Dot {
       this.life *= this.vector.y + 0.1;
     }
   }
-  CheckDots(dots) {
+  CheckDots(population) {
     let smallestdistance = 100000;
-    for (let closeIndex = 0; closeIndex < dots.length; closeIndex++) {
-      let checkDot = dots[closeIndex];
-      if (this !== checkDot) {
-        // check closeness
-        const distance = this.GetDistance(checkDot);
-        if (closeIndex === 0 || distance < smallestdistance) {
-          smallestdistance = distance;
-          this.nearestDot = checkDot;
-          //checkDot.nearestDot = this;
+    for (let popI = 0; popI < population.length; popI++) {
+      for (
+        let closeIndex = 0;
+        closeIndex < population[popI].dots.length;
+        closeIndex++
+      ) {
+        if (this !== population[popI].dots[closeIndex]) {
+          // check closeness
+          const distance = this.GetDistance(population[popI].dots[closeIndex]);
+          if (distance < smallestdistance) {
+            smallestdistance = distance;
+            this.nearestDot = population[popI].dots[closeIndex];
+            //population[popI].dots[closeIndex].nearestDot = this;
 
-          // check closest food
-          if (
-            this.nearestFood === null ||
-            checkDot.life <= this.nearestFood.life
-          ) {
-            this.nearestFood = checkDot;
+            // check closest food
+            if (
+              this.nearestFood === null ||
+              population[popI].dots[closeIndex].life <= this.nearestFood.life
+            ) {
+              this.nearestFood = population[popI].dots[closeIndex];
+            }
           }
         }
       }
@@ -90,10 +95,14 @@ class Dot {
       const dx = this.x - this.nearestDot.x;
       const dy = this.y - this.nearestDot.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance < 5 && this.life <= this.nearestDot.life) {
-        this.nearestDot.life += 1;
-        this.life = -1;
-        return true;
+      if (distance < 5) {
+        if (this.life < this.nearestDot.life) {
+          this.life = -1;
+          return true;
+        } else {
+          this.life += 1;
+          return false;
+        }
       }
     }
     return false;
@@ -146,7 +155,7 @@ class Dot {
     this.inputs.push({ value: this.outputLayer[1].value });
     //this.inputs.push({ value: (centerX - this.x) / centerX });
     //this.inputs.push({ value: (centerY - this.y) / centerY });
-    
+
     this.inputs.push({ value: this.x });
     this.inputs.push({ value: this.y });
     this.inputs.push({ value: this.life });
@@ -196,9 +205,12 @@ class Dot {
     var oldBrain = JSON.parse(localStorage.getItem("BrainSave"));
     if (oldBrain !== null) {
       if (
-        this.layer1[0].connections.length === oldBrain[0][0].connections.length &&
-        this.layer2[0].connections.length === oldBrain[1][0].connections.length &&
-        this.outputLayer[0].connections.length === oldBrain[2][0].connections.length
+        this.layer1[0].connections.length ===
+          oldBrain[0][0].connections.length &&
+        this.layer2[0].connections.length ===
+          oldBrain[1][0].connections.length &&
+        this.outputLayer[0].connections.length ===
+          oldBrain[2][0].connections.length
       ) {
         this.layer1 = oldBrain[0];
         this.layer2 = oldBrain[1];

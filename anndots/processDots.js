@@ -6,7 +6,7 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 100;
+let dotCount = 300;
 
 // // let populationData = {
 // //   mostLife: 0,
@@ -18,11 +18,11 @@ let dotCount = 100;
 
 // // let dots = [];
 let populationCount = 3;
-let population = [];
+let populations = [];
 
 function Init() {
   for (let popI = 0; popI < populationCount; popI++) {
-    population.push({
+    populations.push({
       data: {
         mostLife: 0,
         highestAverage: 0,
@@ -32,24 +32,24 @@ function Init() {
       },
       dots: []
     });
-    
+
     for (let i = 0; i < dotCount; i++) {
-      population[popI].dots.push(new Dot());
+      populations[popI].dots.push(new Dot());
       switch (popI) {
         case 0:
-          population[popI].dots[i].color = { r: 0, g: 255, b: 0 };
+          populations[popI].dots[i].color = { r: 0, g: 255, b: 0 };
           break;
         case 1:
-          population[popI].dots[i].color = { r: 255, g: 0, b: 0 };
+          populations[popI].dots[i].color = { r: 255, g: 0, b: 0 };
           break;
         case 2:
-          population[popI].dots[i].color = { r: 127, g: 127, b: 255 };
+          populations[popI].dots[i].color = { r: 127, g: 127, b: 255 };
           break;
       }
 
-      if (i < dotCount * 0.5) {
-        population[popI].dots[i].RestoreBrain();
-      }
+      //if (i < dotCount * 0.9) {
+      populations[popI].dots[i].RestoreBrain();
+      //}
     }
   }
 
@@ -57,59 +57,60 @@ function Init() {
 }
 
 function DrawGrid() {
-  
-
   for (let popI = 0; popI < populationCount; popI++) {
     let totalLife = 0;
-    population[popI].data.highestAge = 0;
-    population[popI].data.mostLife = 0;
+    populations[popI].data.highestAge = 0;
+    populations[popI].data.mostLife = 0;
     for (let i = 0; i < dotCount; i++) {
-      totalLife += population[popI].dots[i].life;
-      population[popI].dots[i].CheckDots(population[popI].dots);
+      totalLife += populations[popI].dots[i].life;
+      populations[popI].dots[i].CheckDots(populations); //[popI].dots);
 
-      population[popI].dots[i].DoMovement();
-      if (population[popI].dots[i].life > population[popI].data.mostLife) {
-        population[popI].data.mostLife = population[popI].dots[i].life;
+      populations[popI].dots[i].DoMovement();
+      if (populations[popI].dots[i].life > populations[popI].data.mostLife) {
+        populations[popI].data.mostLife = populations[popI].dots[i].life;
       }
 
-      if (population[popI].dots[i].age > population[popI].data.highestAge) {
-        population[popI].data.oldestDot = i;
-        population[popI].data.highestAge = population[popI].dots[i].age;
+      if (populations[popI].dots[i].age > populations[popI].data.highestAge) {
+        populations[popI].data.oldestDot = i;
+        populations[popI].data.highestAge = populations[popI].dots[i].age;
       }
     }
 
     let averageLife = totalLife / dotCount;
-    if (averageLife > population[popI].data.highestAverage) {
-      population[popI].data.highestAverage = averageLife;
+    if (averageLife > populations[popI].data.highestAverage) {
+      populations[popI].data.highestAverage = averageLife;
     }
 
     for (
       let dotIndex = 0;
-      dotIndex < population[popI].dots.length;
+      dotIndex < populations[popI].dots.length;
       dotIndex++
     ) {
-      let dot = population[popI].dots[dotIndex];
-
-      if (dot.CheckDeath() === true) {
-        if (dot.age >= population[popI].data.highestAge) {
-          dot.SaveBrain();
+      if (populations[popI].dots[dotIndex].CheckDeath() === true) {
+        if (
+          populations[popI].dots[dotIndex].age >=
+          populations[popI].data.highestAge
+        ) {
+          populations[popI].dots[dotIndex].SaveBrain();
         }
 
-        let copyDot = population[popI].data.oldestDot;
+        let copyDot = populations[popI].data.oldestDot;
         if (Math.random() < 0.5) {
-          copyDot = Math.floor(Math.random() * population[popI].dots.length);
+          copyDot = Math.floor(Math.random() * populations[popI].dots.length);
         }
 
-        dot.CopyBrain(population[popI].dots[copyDot]);
-        dot.MutateBrain();
+        populations[popI].dots[dotIndex].CopyBrain(
+          populations[popI].dots[copyDot]
+        );
+        populations[popI].dots[dotIndex].MutateBrain();
 
-        dot.x = Math.random() * ctx.canvas.width;
-        dot.y = Math.random() * ctx.canvas.height;
+        populations[popI].dots[dotIndex].x = Math.random() * ctx.canvas.width;
+        populations[popI].dots[dotIndex].y = Math.random() * ctx.canvas.height;
 
-        dot.vector.x = 0;
-        dot.vector.y = 0;
-        dot.life = 10;
-        dot.age = 0;
+        populations[popI].dots[dotIndex].vector.x = 0;
+        populations[popI].dots[dotIndex].vector.y = 0;
+        populations[popI].dots[dotIndex].life = 10;
+        populations[popI].dots[dotIndex].age = 0;
       }
     }
   }
@@ -118,18 +119,18 @@ function DrawGrid() {
   pixels = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
 
   let index = 0;
-  let dot;
+  // let dot;
 
   // draw
   for (let popI = 0; popI < populationCount; popI++) {
     for (let i = 0; i < dotCount; i++) {
-      dot = population[popI].dots[i];
-      let x = Math.floor(dot.x);
-      let y = Math.floor(dot.y);
+      //dot = populations[popI].dots[i];
+      let x = Math.floor(populations[popI].dots[i].x);
+      let y = Math.floor(populations[popI].dots[i].y);
 
-      ////let colorShift = dot.age / population[popI].data.highestAge * 255;
+      ////let colorShift = dot.age / populations[popI].data.highestAge * 255;
       let dotSize = 1;
-      if (i === population[popI].data.oldestDot) {
+      if (i === populations[popI].data.oldestDot) {
         ////colorShift = 255;
         dotSize += 2;
       }
@@ -145,9 +146,9 @@ function DrawGrid() {
               yy > ctx.canvas.height
             )
           ) {
-            pixels.data[index] = dot.color.r; //colorShift;
-            pixels.data[index + 1] = dot.color.g; //255 - colorShift;
-            pixels.data[index + 2] = dot.color.b; //0;
+            pixels.data[index] = populations[popI].dots[i].color.r; //colorShift;
+            pixels.data[index + 1] = populations[popI].dots[i].color.g; //255 - colorShift;
+            pixels.data[index + 2] = populations[popI].dots[i].color.b; //0;
             pixels.data[index + 3] = 255;
           }
         }
@@ -160,8 +161,8 @@ function DrawGrid() {
   // // ctx.font = "10px Arial";
   // // ctx.fillStyle = "white";
   // // ctx.fillText("average energy: " + averageLife.toFixed(3), 10, 40);
-  // // ctx.fillText("most energy: " + population[popI].data.mostLife.toFixed(3), 10, 50);
-  // // ctx.fillText("oldest age: " + population[popI].data.highestAge, 10, 60);
+  // // ctx.fillText("most energy: " + populations[popI].data.mostLife.toFixed(3), 10, 50);
+  // // ctx.fillText("oldest age: " + populations[popI].data.highestAge, 10, 60);
 
   setTimeout(function() {
     DrawGrid();
