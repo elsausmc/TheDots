@@ -1,6 +1,9 @@
 class Dot {
   constructor() {
-    this.vector = { x: 0, y: 0 };
+    this.vector = {
+      x: 0,
+      y: 0
+    };
     this.color = {
       r: Math.floor(Math.random() * 256), //127 + Math.floor(Math.random() * 127),
       g: Math.floor(Math.random() * 256), //127 + Math.floor(Math.random() * 127),
@@ -14,7 +17,7 @@ class Dot {
     this.x = Math.random() * ctx.canvas.width;
     this.y = Math.random() * ctx.canvas.height;
     // inputs
-    this.inputCount = 13;
+    this.inputCount = 14;
     this.inputs = new Array(this.inputCount).fill(0);
     this.layer1Count = 6;
     this.layer1 = [];
@@ -60,12 +63,10 @@ class Dot {
     }
   }
   CheckDots(population) {
-    let smallestdistance = 100000;
+    let smallestdistance = 100000000;
     for (let popI = 0; popI < population.length; popI++) {
       for (
-        let closeIndex = 0;
-        closeIndex < population[popI].dots.length;
-        closeIndex++
+        let closeIndex = 0; closeIndex < population[popI].dots.length; closeIndex++
       ) {
         if (this !== population[popI].dots[closeIndex]) {
           // check closeness
@@ -73,12 +74,17 @@ class Dot {
           if (distance < smallestdistance) {
             smallestdistance = distance;
             this.nearestDot = population[popI].dots[closeIndex];
+          }
 
-            // check closest food
-            if (
-              this.nearestFood === null ||
-              population[popI].dots[closeIndex].life <= this.nearestFood.life
-            ) {
+          // check closest food
+          if (this.DifferentColor(population[popI].dots[closeIndex].color)) {
+            if (this.nearestFood === null){
+              this.nearestFood = population[popI].dots[closeIndex];
+            }
+
+            const foodDistance = this.GetDistance(population[popI].dots[closeIndex]);
+          
+            if(foodDistance <= this.GetDistance(this.nearestFood) && population[popI].dots[closeIndex].life <= this.nearestFood.life) {
               this.nearestFood = population[popI].dots[closeIndex];
             }
           }
@@ -95,16 +101,21 @@ class Dot {
       const dy = this.y - this.nearestDot.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
       if (distance < 5) {
-        if (this.life < this.nearestDot.life) {
-          this.life = -1;
-          return true;
-        } else {
-          this.life += 1;
-          return false;
+        if (this.DifferentColor(this.nearestDot.color)) {
+          if (this.life < this.nearestDot.life) {
+            this.life = -1;
+            return true;
+          } else {
+            this.life += 1;
+            return false;
+          }
         }
       }
     }
     return false;
+  }
+  DifferentColor(otherColor) {
+    return this.color.r !== otherColor.r || this.color.g !== otherColor.g || this.color.b !== otherColor.b;
   }
   CopyBrain(otherDot) {
     // copy layer1
@@ -150,24 +161,53 @@ class Dot {
   }
   GetInputs() {
     this.inputs = [];
-    this.inputs.push({ value: this.outputLayer[0].value });
-    this.inputs.push({ value: this.outputLayer[1].value });
+    this.inputs.push({
+      value: this.outputLayer[0].value
+    });
+    this.inputs.push({
+      value: this.outputLayer[1].value
+    });
     //this.inputs.push({ value: (centerX - this.x) / centerX });
     //this.inputs.push({ value: (centerY - this.y) / centerY });
+    this.inputs.push({
+      value: this.NearWall()
+    });
 
-    this.inputs.push({ value: this.x });
-    this.inputs.push({ value: this.y });
-    this.inputs.push({ value: this.life });
-    this.inputs.push({ value: this.vector.x });
-    this.inputs.push({ value: this.vector.y });
+    this.inputs.push({
+      value: this.x
+    });
+    this.inputs.push({
+      value: this.y
+    });
+    this.inputs.push({
+      value: this.life
+    });
+    this.inputs.push({
+      value: this.vector.x
+    });
+    this.inputs.push({
+      value: this.vector.y
+    });
 
-    this.inputs.push({ value: this.nearestDot.x - this.x });
-    this.inputs.push({ value: this.nearestDot.y - this.y });
-    this.inputs.push({ value: this.nearestDot.life - this.life });
+    this.inputs.push({
+      value: this.nearestDot.x - this.x
+    });
+    this.inputs.push({
+      value: this.nearestDot.y - this.y
+    });
+    this.inputs.push({
+      value: this.nearestDot.life - this.life
+    });
 
-    this.inputs.push({ value: this.nearestFood.x - this.x });
-    this.inputs.push({ value: this.nearestFood.y - this.y });
-    this.inputs.push({ value: this.nearestFood.life - this.life });
+    this.inputs.push({
+      value: this.nearestFood.x - this.x
+    });
+    this.inputs.push({
+      value: this.nearestFood.y - this.y
+    });
+    this.inputs.push({
+      value: this.nearestFood.life - this.life
+    });
   }
   MutateBrain() {
     const layer = Math.floor(Math.random() * 3);
@@ -191,6 +231,14 @@ class Dot {
     outputLayer[neuronIndex].connections[connectionIndex].weight +=
       Math.random() * 2 - 1;
   }
+  NearWall() {
+    return (
+      this.x > ctx.canvas.width - 100 ||
+      this.x < 100 ||
+      this.y > ctx.canvas.height - 100 ||
+      this.y < 100
+    ) ? 1 : -1;
+  }
   ProcessLayer(layer, input) {
     layer.forEach(neuron => {
       let inputValues = 0;
@@ -205,11 +253,11 @@ class Dot {
     if (oldBrain !== null) {
       if (
         this.layer1[0].connections.length ===
-          oldBrain[0][0].connections.length &&
+        oldBrain[0][0].connections.length &&
         this.layer2[0].connections.length ===
-          oldBrain[1][0].connections.length &&
+        oldBrain[1][0].connections.length &&
         this.outputLayer[0].connections.length ===
-          oldBrain[2][0].connections.length
+        oldBrain[2][0].connections.length
       ) {
         this.layer1 = oldBrain[0];
         this.layer2 = oldBrain[1];

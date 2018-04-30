@@ -6,7 +6,7 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 100;
+let dotCount = 255;
 let veryOldest = 0;
 
 // // let populationData = {
@@ -38,19 +38,31 @@ function Init() {
       populations[popI].dots.push(new Dot());
       switch (popI) {
         case 0:
-          populations[popI].dots[i].color = { r: 0, g: 255, b: 0 };
+          populations[popI].dots[i].color = {
+            r: 0,
+            g: 255,
+            b: 0
+          };
           break;
         case 1:
-          populations[popI].dots[i].color = { r: 255, g: 0, b: 0 };
+          populations[popI].dots[i].color = {
+            r: 255,
+            g: 0,
+            b: 0
+          };
           break;
         case 2:
-          populations[popI].dots[i].color = { r: 127, g: 127, b: 255 };
+          populations[popI].dots[i].color = {
+            r: 127,
+            g: 127,
+            b: 255
+          };
           break;
       }
 
-      //if (i < dotCount * 0.9) {
-      populations[popI].dots[i].RestoreBrain();
-      //}
+      if (i < dotCount * 0.9) {
+        populations[popI].dots[i].RestoreBrain();
+      }
     }
   }
 
@@ -86,9 +98,7 @@ function DrawGrid() {
     }
 
     for (
-      let dotIndex = 0;
-      dotIndex < populations[popI].dots.length;
-      dotIndex++
+      let dotIndex = 0; dotIndex < populations[popI].dots.length; dotIndex++
     ) {
       if (populations[popI].dots[dotIndex].CheckDeath() === true) {
         if (populations[popI].dots[dotIndex].age >= veryOldest) {
@@ -139,14 +149,12 @@ function DrawGrid() {
       for (let xx = x - dotSize; xx <= x + dotSize; xx++) {
         for (let yy = y - dotSize; yy <= y + dotSize; yy++) {
           index = (xx + yy * ctx.canvas.width) * 4;
-          if (
-            !(
+          if (!(
               xx < 0 ||
               yy < 0 ||
               xx > ctx.canvas.width ||
               yy > ctx.canvas.height
-            )
-          ) {
+            )) {
             pixels.data[index] = populations[popI].dots[i].color.r; //colorShift;
             pixels.data[index + 1] = populations[popI].dots[i].color.g; //255 - colorShift;
             pixels.data[index + 2] = populations[popI].dots[i].color.b; //0;
@@ -165,7 +173,7 @@ function DrawGrid() {
   // // ctx.fillText("most energy: " + populations[popI].data.mostLife.toFixed(3), 10, 50);
   // // ctx.fillText("oldest age: " + populations[popI].data.highestAge, 10, 60);
 
-  setTimeout(function() {
+  setTimeout(function () {
     DrawGrid();
   }, 1);
   return;
