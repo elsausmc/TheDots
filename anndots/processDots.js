@@ -6,7 +6,8 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 300;
+let dotCount = 100;
+let veryOldest = 0;
 
 // // let populationData = {
 // //   mostLife: 0,
@@ -73,6 +74,9 @@ function DrawGrid() {
       if (populations[popI].dots[i].age > populations[popI].data.highestAge) {
         populations[popI].data.oldestDot = i;
         populations[popI].data.highestAge = populations[popI].dots[i].age;
+        if (populations[popI].dots[i].age > veryOldest) {
+          veryOldest = populations[popI].dots[i].age;
+        }
       }
     }
 
@@ -87,10 +91,7 @@ function DrawGrid() {
       dotIndex++
     ) {
       if (populations[popI].dots[dotIndex].CheckDeath() === true) {
-        if (
-          populations[popI].dots[dotIndex].age >=
-          populations[popI].data.highestAge
-        ) {
+        if (populations[popI].dots[dotIndex].age >= veryOldest) {
           populations[popI].dots[dotIndex].SaveBrain();
         }
 
@@ -124,15 +125,15 @@ function DrawGrid() {
   // draw
   for (let popI = 0; popI < populationCount; popI++) {
     for (let i = 0; i < dotCount; i++) {
-      //dot = populations[popI].dots[i];
       let x = Math.floor(populations[popI].dots[i].x);
       let y = Math.floor(populations[popI].dots[i].y);
 
-      ////let colorShift = dot.age / populations[popI].data.highestAge * 255;
       let dotSize = 1;
       if (i === populations[popI].data.oldestDot) {
-        ////colorShift = 255;
         dotSize += 2;
+        if (populations[popI].dots[i] >= veryOldest) {
+          dotSize += 2;
+        }
       }
 
       for (let xx = x - dotSize; xx <= x + dotSize; xx++) {

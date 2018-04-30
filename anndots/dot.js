@@ -73,7 +73,6 @@ class Dot {
           if (distance < smallestdistance) {
             smallestdistance = distance;
             this.nearestDot = population[popI].dots[closeIndex];
-            //population[popI].dots[closeIndex].nearestDot = this;
 
             // check closest food
             if (
