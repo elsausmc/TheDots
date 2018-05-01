@@ -17,7 +17,7 @@ class Dot {
     this.x = Math.random() * ctx.canvas.width;
     this.y = Math.random() * ctx.canvas.height;
     // inputs
-    this.inputCount = 14;
+    this.inputCount = 11;
     this.inputs = new Array(this.inputCount).fill(0);
     this.layer1Count = 6;
     this.layer1 = [];
@@ -66,7 +66,9 @@ class Dot {
     let smallestdistance = 100000000;
     for (let popI = 0; popI < population.length; popI++) {
       for (
-        let closeIndex = 0; closeIndex < population[popI].dots.length; closeIndex++
+        let closeIndex = 0;
+        closeIndex < population[popI].dots.length;
+        closeIndex++
       ) {
         if (this !== population[popI].dots[closeIndex]) {
           // check closeness
@@ -78,13 +80,18 @@ class Dot {
 
           // check closest food
           if (this.DifferentColor(population[popI].dots[closeIndex].color)) {
-            if (this.nearestFood === null){
+            if (this.nearestFood === null) {
               this.nearestFood = population[popI].dots[closeIndex];
             }
 
-            const foodDistance = this.GetDistance(population[popI].dots[closeIndex]);
-          
-            if(foodDistance <= this.GetDistance(this.nearestFood) && population[popI].dots[closeIndex].life <= this.nearestFood.life) {
+            const foodDistance = this.GetDistance(
+              population[popI].dots[closeIndex]
+            );
+
+            if (
+              foodDistance <= this.GetDistance(this.nearestFood) &&
+              population[popI].dots[closeIndex].life <= this.nearestFood.life
+            ) {
               this.nearestFood = population[popI].dots[closeIndex];
             }
           }
@@ -115,7 +122,11 @@ class Dot {
     return false;
   }
   DifferentColor(otherColor) {
-    return this.color.r !== otherColor.r || this.color.g !== otherColor.g || this.color.b !== otherColor.b;
+    return (
+      this.color.r !== otherColor.r ||
+      this.color.g !== otherColor.g ||
+      this.color.b !== otherColor.b
+    );
   }
   CopyBrain(otherDot) {
     // copy layer1
@@ -169,16 +180,13 @@ class Dot {
     });
     //this.inputs.push({ value: (centerX - this.x) / centerX });
     //this.inputs.push({ value: (centerY - this.y) / centerY });
-    this.inputs.push({
-      value: this.NearWall()
-    });
 
-    this.inputs.push({
-      value: this.x
-    });
-    this.inputs.push({
-      value: this.y
-    });
+    // // this.inputs.push({
+    // //   value: this.x
+    // // });
+    // // this.inputs.push({
+    // //   value: this.y
+    // // });
     this.inputs.push({
       value: this.life
     });
@@ -232,19 +240,20 @@ class Dot {
       Math.random() * 2 - 1;
   }
   NearWall() {
-    return (
-      this.x > ctx.canvas.width - 100 ||
+    return this.x > ctx.canvas.width - 100 ||
       this.x < 100 ||
       this.y > ctx.canvas.height - 100 ||
       this.y < 100
-    ) ? 1 : -1;
+      ? 1
+      : -1;
   }
   ProcessLayer(layer, input) {
     layer.forEach(neuron => {
       let inputValues = 0;
-      for (let ci = 0; ci < neuron.connections.length; ci++) {
+      for (let ci = 0; ci < neuron.connections.length - 1; ci++) {
         inputValues += input[ci].value * neuron.connections[ci].weight;
       }
+      inputValues += neuron.connections[neuron.connections.length - 1].weight;
       neuron.value = 1 / (1 + Math.exp(-inputValues)) - 0.5;
     });
   }
@@ -253,11 +262,11 @@ class Dot {
     if (oldBrain !== null) {
       if (
         this.layer1[0].connections.length ===
-        oldBrain[0][0].connections.length &&
+          oldBrain[0][0].connections.length &&
         this.layer2[0].connections.length ===
-        oldBrain[1][0].connections.length &&
+          oldBrain[1][0].connections.length &&
         this.outputLayer[0].connections.length ===
-        oldBrain[2][0].connections.length
+          oldBrain[2][0].connections.length
       ) {
         this.layer1 = oldBrain[0];
         this.layer2 = oldBrain[1];

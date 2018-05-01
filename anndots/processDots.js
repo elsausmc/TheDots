@@ -6,7 +6,7 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 50;
+let dotCount = 100;
 let veryOldest = 0;
 
 // // let populationData = {
@@ -60,7 +60,7 @@ function Init() {
           break;
       }
 
-      if (i < dotCount * 0.9) {
+      if (i < dotCount * 0.90) {
         populations[popI].dots[i].RestoreBrain();
       }
     }
