@@ -6,7 +6,7 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 25;
+let dotCount = 100;
 let veryOldest = 0;
 
 // // let populationData = {
