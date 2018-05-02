@@ -239,14 +239,6 @@ class Dot {
     outputLayer[neuronIndex].connections[connectionIndex].weight +=
       Math.random() * 2 - 1;
   }
-  NearWall() {
-    return this.x > ctx.canvas.width - 100 ||
-      this.x < 100 ||
-      this.y > ctx.canvas.height - 100 ||
-      this.y < 100
-      ? 1
-      : -1;
-  }
   ProcessLayer(layer, input) {
     layer.forEach(neuron => {
       let inputValues = 0;
