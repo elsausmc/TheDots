@@ -66,9 +66,7 @@ class Dot {
     let smallestdistance = 100000000;
     for (let popI = 0; popI < population.length; popI++) {
       for (
-        let closeIndex = 0;
-        closeIndex < population[popI].dots.length;
-        closeIndex++
+        let closeIndex = 0; closeIndex < population[popI].dots.length; closeIndex++
       ) {
         if (this !== population[popI].dots[closeIndex]) {
           // check closeness
@@ -176,15 +174,6 @@ class Dot {
     this.inputs.push({
       value: this.outputLayer[1].value
     });
-    //this.inputs.push({ value: (centerX - this.x) / centerX });
-    //this.inputs.push({ value: (centerY - this.y) / centerY });
-
-    // // this.inputs.push({
-    // //   value: this.x
-    // // });
-    // // this.inputs.push({
-    // //   value: this.y
-    // // });
     this.inputs.push({
       value: this.life
     });
@@ -246,8 +235,8 @@ class Dot {
       //neuron.value = Math.max(0,inputValues); // ReLU
     });
   }
-  RestoreBrain() {
-    var oldBrain = JSON.parse(localStorage.getItem("BrainSave"));
+  RestoreBrain(populationIndex) {
+    var oldBrain = JSON.parse(localStorage.getItem("BrainSave" + populationIndex));
     if (oldBrain !== null) {
       if (
         this.layer1.length === oldBrain[0][0].length && this.layer1[0].connections.length === oldBrain[0][0].connections.length &&
@@ -260,14 +249,14 @@ class Dot {
       }
     }
   }
-  SaveBrain() {
+  SaveBrain(populationIndex) {
     var layers = [];
     layers.push(this.layer1);
     layers.push(this.layer2);
     layers.push(this.outputLayer);
 
     var dotString = JSON.stringify(layers);
-    localStorage.setItem("BrainSave", dotString);
+    localStorage.setItem("BrainSave" + populationIndex, dotString);
   }
   StopAtWall() {
     if (this.x > ctx.canvas.width - 1) {

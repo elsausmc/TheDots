@@ -52,7 +52,7 @@ function Init() {
       }
 
       if (i < dotCount * 0.90) {
-        populations[popI].dots[i].RestoreBrain();
+        populations[popI].dots[i].RestoreBrain(popI);
       }
     }
   }
