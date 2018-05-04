@@ -7,7 +7,7 @@ class Dot {
     this.color = {
       r: Math.floor(Math.random() * 256), //127 + Math.floor(Math.random() * 127),
       g: Math.floor(Math.random() * 256), //127 + Math.floor(Math.random() * 127),
-      b: Math.floor(Math.random() * 256)  //127 + Math.floor(Math.random() * 127)
+      b: Math.floor(Math.random() * 256) //127 + Math.floor(Math.random() * 127)
     };
     this.age = 0;
     this.life = Math.random() * 10;
@@ -22,16 +22,14 @@ class Dot {
     this.layers.push(new Array(6).fill(new neuron(this.layers[0].length)));
     this.layers.push(new Array(6).fill(new neuron(this.layers[1].length)));
     this.layers.push(new Array(4).fill(new neuron(this.layers[2].length)));
-    
+
 
     // inputs
-
-    this.inputs = new Array(11).fill({ value: 0 });
 
     this.layer1 = [];
     // hidden layer 1
     for (let index = 0; index < 6; index++) {
-      this.layer1.push(new neuron(this.inputs.length));
+      this.layer1.push(new neuron(this.layers[0].length));
     }
 
     this.layer2 = [];
@@ -175,40 +173,41 @@ class Dot {
     return distance;
   }
   GetInputs() {
-    this.inputs = [];
-    this.inputs.push({
+    this.layers[0] = [];
+
+    this.layers[0].push({
       value: this.outputLayer[0].value
     });
-    this.inputs.push({
+    this.layers[0].push({
       value: this.outputLayer[1].value
     });
-    this.inputs.push({
+    this.layers[0].push({
       value: this.life
     });
-    this.inputs.push({
+    this.layers[0].push({
       value: this.vector.x
     });
-    this.inputs.push({
+    this.layers[0].push({
       value: this.vector.y
     });
 
-    this.inputs.push({
+    this.layers[0].push({
       value: this.nearestDot.x - this.x
     });
-    this.inputs.push({
+    this.layers[0].push({
       value: this.nearestDot.y - this.y
     });
-    this.inputs.push({
+    this.layers[0].push({
       value: this.nearestDot.life - this.life
     });
 
-    this.inputs.push({
+    this.layers[0].push({
       value: this.nearestFood.x - this.x
     });
-    this.inputs.push({
+    this.layers[0].push({
       value: this.nearestFood.y - this.y
     });
-    this.inputs.push({
+    this.layers[0].push({
       value: this.nearestFood.life - this.life
     });
   }
@@ -286,7 +285,7 @@ class Dot {
   }
   Think() {
     this.GetInputs();
-    this.ProcessLayer(this.layer1, this.inputs);
+    this.ProcessLayer(this.layer1, this.layers[0]);
     this.ProcessLayer(this.layer2, this.layer1);
     this.ProcessLayer(this.outputLayer, this.layer2);
   }
