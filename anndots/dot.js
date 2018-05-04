@@ -230,9 +230,9 @@ class Dot {
         inputValues += input[ci].value * neuron.connections[ci].weight;
       }
       inputValues += neuron.connections[neuron.connections.length - 1].weight;
-      //neuron.value = 1 / (1 + Math.exp(-inputValues));  // sigmoid
-      //neuron.value = Math.tanh(inputValues);
-      neuron.value = Math.max(0,inputValues); // ReLU
+      //// neuron.value = 1 / (1 + Math.exp(-inputValues));  // sigmoid
+      neuron.value = Math.tanh(inputValues);
+      //// neuron.value = Math.max(0,inputValues); // ReLU
     });
   }
   RestoreBrain(populationIndex) {
