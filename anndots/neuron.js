@@ -4,7 +4,7 @@ class neuron {
     this.connections = [];
     for (let index = 0; index <= connectionCount; index++) {
       this.connections.push({
-        weight: (Math.random() * 2 - 1) * 0.001
+        weight: 0 // (Math.random() * 2 - 1) * 0.001
       });
     }
   }

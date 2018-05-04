@@ -51,7 +51,7 @@ function Init() {
           break;
       }
 
-      if (i < dotCount * 0.9) {
+      if (i < dotCount * 0.90) {
         populations[popI].dots[i].RestoreBrain();
       }
     }
@@ -61,13 +61,14 @@ function Init() {
 }
 
 function DoTheThings() {
+  veryOldest = 0;
   for (let popI = 0; popI < populationCount; popI++) {
     let totalLife = 0;
     populations[popI].data.highestAge = 0;
     populations[popI].data.mostLife = 0;
     for (let i = 0; i < dotCount; i++) {
       totalLife += populations[popI].dots[i].life;
-      populations[popI].dots[i].CheckDots(populations); //[popI].dots);
+      populations[popI].dots[i].CheckDots(populations);
 
       populations[popI].dots[i].DoMovement();
       if (populations[popI].dots[i].life > populations[popI].data.mostLife) {
@@ -139,11 +140,12 @@ function DrawGrid() {
 
       let dotSize = 1;
       if (i === populations[popI].data.oldestDot) {
-        dotSize += 2;
-        if (populations[popI].dots[i] >= veryOldest) {
-          dotSize += 2;
+        dotSize = 2;
+        if (populations[popI].dots[i].age >= veryOldest) {
+          dotSize = 3;
         }
       }
+      
 
       for (let xx = x - dotSize; xx <= x + dotSize; xx++) {
         for (let yy = y - dotSize; yy <= y + dotSize; yy++) {

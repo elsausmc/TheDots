@@ -11,7 +11,7 @@ class Dot {
     };
     this.age = 0;
     this.life = Math.random() * 10;
-    this.tickRate = 0.01;
+    this.tickRate = 0.02;
     this.nearestDot = null;
     this.nearestFood = null;
     this.x = Math.random() * ctx.canvas.width;
@@ -32,7 +32,7 @@ class Dot {
       this.layer2.push(new neuron(this.layer1Count));
     }
     // output
-    this.outputCount = 2;
+    this.outputCount = 4;
     this.outputLayer = [];
     for (let index = 0; index < this.outputCount; index++) {
       this.outputLayer.push(new neuron(this.layer2Count));
@@ -110,10 +110,10 @@ class Dot {
       if (distance < 5) {
         if (this.DifferentColor(this.nearestDot.color)) {
           if (this.life < this.nearestDot.life) {
-            this.life = -1;
+            this.life = -2;
             return true;
           } else {
-            this.life += 1;
+            this.life += 2;
             return false;
           }
         }
@@ -153,14 +153,12 @@ class Dot {
   }
   DoMovement() {
     this.Think();
-    this.vector.x += this.outputLayer[0].value;
-    this.vector.y += this.outputLayer[1].value;
+    this.vector.x += this.outputLayer[0].value - this.outputLayer[1].value;
+    this.vector.y += this.outputLayer[2].value - this.outputLayer[3].value;
     this.x += this.vector.x;
     this.y += this.vector.y;
 
-    const lastVector =
-      Math.sqrt(this.vector.x * this.vector.x + this.vector.y * this.vector.y) /
-      1000;
+    const lastVector = Math.sqrt(this.vector.x * this.vector.x + this.vector.y * this.vector.y) / 1000;
     this.life -= this.tickRate + lastVector;
     this.age++;
   }
@@ -233,11 +231,8 @@ class Dot {
   }
   MutateNeuron(outputLayer) {
     let neuronIndex = Math.floor(Math.random() * outputLayer.length);
-    let connectionIndex = Math.floor(
-      Math.random() * outputLayer[neuronIndex].connections.length
-    );
-    outputLayer[neuronIndex].connections[connectionIndex].weight +=
-      Math.random() * 2 - 1;
+    let connectionIndex = Math.floor(Math.random() * outputLayer[neuronIndex].connections.length);
+    outputLayer[neuronIndex].connections[connectionIndex].weight += Math.random() * 2 - 1;
   }
   ProcessLayer(layer, input) {
     layer.forEach(neuron => {
@@ -246,19 +241,18 @@ class Dot {
         inputValues += input[ci].value * neuron.connections[ci].weight;
       }
       inputValues += neuron.connections[neuron.connections.length - 1].weight;
-      neuron.value = 1 / (1 + Math.exp(-inputValues)) - 0.5;
+      //neuron.value = 1 / (1 + Math.exp(-inputValues));  // sigmoid
+      neuron.value = Math.tanh(inputValues);
+      //neuron.value = Math.max(0,inputValues); // ReLU
     });
   }
   RestoreBrain() {
     var oldBrain = JSON.parse(localStorage.getItem("BrainSave"));
     if (oldBrain !== null) {
       if (
-        this.layer1[0].connections.length ===
-          oldBrain[0][0].connections.length &&
-        this.layer2[0].connections.length ===
-          oldBrain[1][0].connections.length &&
-        this.outputLayer[0].connections.length ===
-          oldBrain[2][0].connections.length
+        this.layer1.length === oldBrain[0][0].length && this.layer1[0].connections.length === oldBrain[0][0].connections.length &&
+        this.layer2.length === oldBrain[1][0].length && this.layer2[0].connections.length === oldBrain[1][0].connections.length &&
+        this.outputLayer.length === oldBrain[2][0].length && this.outputLayer[0].connections.length === oldBrain[2][0].connections.length
       ) {
         this.layer1 = oldBrain[0];
         this.layer2 = oldBrain[1];
@@ -295,10 +289,6 @@ class Dot {
   }
   Think() {
     this.GetInputs();
-    // // this.ProcessLayer1();
-    // // this.ProcessLayer2();
-    // // this.ProcessOutput();
-
     this.ProcessLayer(this.layer1, this.inputs);
     this.ProcessLayer(this.layer2, this.layer1);
     this.ProcessLayer(this.outputLayer, this.layer2);
