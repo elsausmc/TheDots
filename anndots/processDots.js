@@ -51,9 +51,9 @@ function Init() {
           break;
       }
 
-      if (i < dotCount * 0.90) {
+      //if (i < dotCount * 0.90) {
         populations[popI].dots[i].RestoreBrain(popI);
-      }
+      //}
     }
   }
 
@@ -90,12 +90,10 @@ function DoTheThings() {
     }
 
     for (
-      let dotIndex = 0;
-      dotIndex < populations[popI].dots.length;
-      dotIndex++
+      let dotIndex = 0; dotIndex < populations[popI].dots.length; dotIndex++
     ) {
       if (populations[popI].dots[dotIndex].CheckDeath() === true) {
-        if (populations[popI].dots[dotIndex].age >= veryOldest) {
+        if (populations[popI].dots[dotIndex].age >= populations[popI].data.highestAge) {
           populations[popI].dots[dotIndex].SaveBrain(popI);
         }
 
@@ -145,19 +143,17 @@ function DrawGrid() {
           dotSize = 3;
         }
       }
-      
+
 
       for (let xx = x - dotSize; xx <= x + dotSize; xx++) {
         for (let yy = y - dotSize; yy <= y + dotSize; yy++) {
           index = (xx + yy * ctx.canvas.width) * 4;
-          if (
-            !(
+          if (!(
               xx < 0 ||
               yy < 0 ||
               xx > ctx.canvas.width ||
               yy > ctx.canvas.height
-            )
-          ) {
+            )) {
             pixels.data[index] = populations[popI].dots[i].color.r; //colorShift;
             pixels.data[index + 1] = populations[popI].dots[i].color.g; //255 - colorShift;
             pixels.data[index + 2] = populations[popI].dots[i].color.b; //0;
@@ -176,7 +172,7 @@ function DrawGrid() {
   // // ctx.fillText("most energy: " + populations[popI].data.mostLife.toFixed(3), 10, 50);
   // // ctx.fillText("oldest age: " + populations[popI].data.highestAge, 10, 60);
 
-  setTimeout(function() {
+  setTimeout(function () {
     DrawGrid();
   }, 1);
   return;

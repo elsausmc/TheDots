@@ -7,7 +7,7 @@ class Dot {
     this.color = {
       r: Math.floor(Math.random() * 256), //127 + Math.floor(Math.random() * 127),
       g: Math.floor(Math.random() * 256), //127 + Math.floor(Math.random() * 127),
-      b: Math.floor(Math.random() * 256) //127 + Math.floor(Math.random() * 127)
+      b: Math.floor(Math.random() * 256)  //127 + Math.floor(Math.random() * 127)
     };
     this.age = 0;
     this.life = Math.random() * 10;
@@ -16,26 +16,34 @@ class Dot {
     this.nearestFood = null;
     this.x = Math.random() * ctx.canvas.width;
     this.y = Math.random() * ctx.canvas.height;
+
+    this.layers = [];
+    this.layers.push(new Array(11).fill({ value: 0 }));
+    this.layers.push(new Array(6).fill(new neuron(this.layers[0].length)));
+    this.layers.push(new Array(6).fill(new neuron(this.layers[1].length)));
+    this.layers.push(new Array(4).fill(new neuron(this.layers[2].length)));
+    
+
     // inputs
-    this.inputCount = 11;
-    this.inputs = new Array(this.inputCount).fill(0);
-    this.layer1Count = 6;
+
+    this.inputs = new Array(11).fill({ value: 0 });
+
     this.layer1 = [];
     // hidden layer 1
-    for (let index = 0; index < this.layer1Count; index++) {
-      this.layer1.push(new neuron(this.inputCount));
+    for (let index = 0; index < 6; index++) {
+      this.layer1.push(new neuron(this.inputs.length));
     }
-    this.layer2Count = 6;
+
     this.layer2 = [];
     // hidden layer 1
-    for (let index = 0; index < this.layer2Count; index++) {
-      this.layer2.push(new neuron(this.layer1Count));
+    for (let index = 0; index < 6; index++) {
+      this.layer2.push(new neuron(this.layer1.length));
     }
     // output
-    this.outputCount = 4;
+
     this.outputLayer = [];
-    for (let index = 0; index < this.outputCount; index++) {
-      this.outputLayer.push(new neuron(this.layer2Count));
+    for (let index = 0; index < 4; index++) {
+      this.outputLayer.push(new neuron(this.layer2.length));
     }
   }
   Bounce() {
@@ -239,9 +247,9 @@ class Dot {
     var oldBrain = JSON.parse(localStorage.getItem("BrainSave" + populationIndex));
     if (oldBrain !== null) {
       if (
-        this.layer1.length === oldBrain[0][0].length && this.layer1[0].connections.length === oldBrain[0][0].connections.length &&
-        this.layer2.length === oldBrain[1][0].length && this.layer2[0].connections.length === oldBrain[1][0].connections.length &&
-        this.outputLayer.length === oldBrain[2][0].length && this.outputLayer[0].connections.length === oldBrain[2][0].connections.length
+        this.layer1.length === oldBrain[0].length && this.layer1[0].connections.length === oldBrain[0][0].connections.length &&
+        this.layer2.length === oldBrain[1].length && this.layer2[0].connections.length === oldBrain[1][0].connections.length &&
+        this.outputLayer.length === oldBrain[2].length && this.outputLayer[0].connections.length === oldBrain[2][0].connections.length
       ) {
         this.layer1 = oldBrain[0];
         this.layer2 = oldBrain[1];
