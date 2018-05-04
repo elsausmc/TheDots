@@ -96,7 +96,7 @@ function DoTheThings() {
     ) {
       if (populations[popI].dots[dotIndex].CheckDeath() === true) {
         if (populations[popI].dots[dotIndex].age >= veryOldest) {
-          populations[popI].dots[dotIndex].SaveBrain();
+          populations[popI].dots[dotIndex].SaveBrain(popI);
         }
 
         let copyDot = populations[popI].data.oldestDot;
