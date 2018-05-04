@@ -18,55 +18,12 @@ class Dot {
     this.y = Math.random() * ctx.canvas.height;
 
     this.layers = [];
-    this.layers.push(new Array(11).fill({ value: 0 }));
+    this.layers.push(new Array(13).fill({
+      value: 0
+    }));
     this.layers.push(new Array(6).fill(new neuron(this.layers[0].length)));
     this.layers.push(new Array(6).fill(new neuron(this.layers[1].length)));
     this.layers.push(new Array(4).fill(new neuron(this.layers[2].length)));
-
-
-    // inputs
-
-    this.layer1 = [];
-    // hidden layer 1
-    for (let index = 0; index < 6; index++) {
-      this.layer1.push(new neuron(this.layers[0].length));
-    }
-
-    this.layer2 = [];
-    // hidden layer 1
-    for (let index = 0; index < 6; index++) {
-      this.layer2.push(new neuron(this.layer1.length));
-    }
-    // output
-
-    this.outputLayer = [];
-    for (let index = 0; index < 4; index++) {
-      this.outputLayer.push(new neuron(this.layer2.length));
-    }
-  }
-  Bounce() {
-    // Bounce
-    var bounce = -0.5;
-    if (this.x > ctx.canvas.width - 1) {
-      this.x = ctx.canvas.width - 1;
-      this.vector.x *= bounce;
-      this.life -= this.vector.x + 0.1;
-    }
-    if (this.x < 1) {
-      this.x = 0;
-      this.vector.x *= bounce;
-      this.life *= this.vector.x + 0.1;
-    }
-    if (this.y > ctx.canvas.height - 1) {
-      this.y = ctx.canvas.height - 1;
-      this.vector.y *= bounce;
-      this.life *= this.vector.y + 0.1;
-    }
-    if (this.y < 1) {
-      this.y = 0;
-      this.vector.y *= bounce;
-      this.life *= this.vector.y + 0.1;
-    }
   }
   CheckDots(population) {
     let smallestdistance = 100000000;
@@ -133,32 +90,23 @@ class Dot {
     );
   }
   CopyBrain(otherDot) {
-    // copy layer1
-    for (let ni = 0; ni < this.layer1.length; ni++) {
-      for (let nc = 0; nc < this.layer1[ni].connections.length; nc++) {
-        this.layer1[ni].connections[nc].weight =
-          otherDot.layer1[ni].connections[nc].weight;
-      }
-    }
-    // copy layer2
-    for (let ni = 0; ni < this.layer2.length; ni++) {
-      for (let nc = 0; nc < this.layer2[ni].connections.length; nc++) {
-        this.layer2[ni].connections[nc].weight =
-          otherDot.layer2[ni].connections[nc].weight;
-      }
-    }
-    // copy output
-    for (let ni = 0; ni < this.outputLayer.length; ni++) {
-      for (let nc = 0; nc < this.outputLayer[ni].connections.length; nc++) {
-        this.outputLayer[ni].connections[nc].weight =
-          otherDot.outputLayer[ni].connections[nc].weight;
+    // loop through layers
+    for (let layerIndex = 1; layerIndex < this.layers.length; layerIndex++) {
+      // loop though neurons
+      for (let ni = 0; ni < this.layers[layerIndex].length; ni++) {
+        // loop though connections
+        for (let nc = 0; nc < this.layers[layerIndex][ni].connections.length; nc++) {
+          // copy that floppy
+          this.layers[layerIndex][ni].connections[nc].weight = otherDot.layers[layerIndex][ni].connections[nc].weight;
+        }
       }
     }
   }
   DoMovement() {
-    this.Think();
-    this.vector.x += this.outputLayer[0].value - this.outputLayer[1].value;
-    this.vector.y += this.outputLayer[2].value - this.outputLayer[3].value;
+    this.ProcessLayers();
+    let lastLayer = this.layers.length - 1;
+    this.vector.x += this.layers[lastLayer][0].value - this.layers[lastLayer][1].value;
+    this.vector.y += this.layers[lastLayer][2].value - this.layers[lastLayer][3].value;
     this.x += this.vector.x;
     this.y += this.vector.y;
 
@@ -175,12 +123,20 @@ class Dot {
   GetInputs() {
     this.layers[0] = [];
 
+    let lastLayer = this.layers.length - 1;
     this.layers[0].push({
-      value: this.outputLayer[0].value
+      value: this.layers[lastLayer][0].value
     });
     this.layers[0].push({
-      value: this.outputLayer[1].value
+      value: this.layers[lastLayer][1].value
     });
+    this.layers[0].push({
+      value: this.layers[lastLayer][2].value
+    });
+    this.layers[0].push({
+      value: this.layers[lastLayer][3].value
+    });
+
     this.layers[0].push({
       value: this.life
     });
@@ -212,59 +168,62 @@ class Dot {
     });
   }
   MutateBrain() {
-    const layer = Math.floor(Math.random() * 3);
-    switch (layer) {
-      case 0:
-        this.MutateNeuron(this.layer1);
-        break;
-      case 1:
-        this.MutateNeuron(this.layer2);
-        break;
-      default:
-        this.MutateNeuron(this.outputLayer);
-        break;
-    }
-  }
-  MutateNeuron(outputLayer) {
-    let neuronIndex = Math.floor(Math.random() * outputLayer.length);
-    let connectionIndex = Math.floor(Math.random() * outputLayer[neuronIndex].connections.length);
-    outputLayer[neuronIndex].connections[connectionIndex].weight += Math.random() * 2 - 1;
-  }
-  ProcessLayer(layer, input) {
-    layer.forEach(neuron => {
-      let inputValues = 0;
-      for (let ci = 0; ci < neuron.connections.length - 1; ci++) {
-        inputValues += input[ci].value * neuron.connections[ci].weight;
-      }
-      inputValues += neuron.connections[neuron.connections.length - 1].weight;
-      //// neuron.value = 1 / (1 + Math.exp(-inputValues));  // sigmoid
-      neuron.value = Math.tanh(inputValues);
-      //// neuron.value = Math.max(0,inputValues); // ReLU
-    });
-  }
-  RestoreBrain(populationIndex) {
-    var oldBrain = JSON.parse(localStorage.getItem("BrainSave" + populationIndex));
-    if (oldBrain !== null) {
-      if (
-        this.layer1.length === oldBrain[0].length && this.layer1[0].connections.length === oldBrain[0][0].connections.length &&
-        this.layer2.length === oldBrain[1].length && this.layer2[0].connections.length === oldBrain[1][0].connections.length &&
-        this.outputLayer.length === oldBrain[2].length && this.outputLayer[0].connections.length === oldBrain[2][0].connections.length
-      ) {
-        this.layer1 = oldBrain[0];
-        this.layer2 = oldBrain[1];
-        this.outputLayer = oldBrain[2];
-      }
-    }
-  }
-  SaveBrain(populationIndex) {
-    var layers = [];
-    layers.push(this.layer1);
-    layers.push(this.layer2);
-    layers.push(this.outputLayer);
+    // pick a random layer
+    const layer = 1 + Math.floor(Math.random() * (this.layers.length - 1));
 
-    var dotString = JSON.stringify(layers);
-    localStorage.setItem("BrainSave" + populationIndex, dotString);
+    // pick a random neuron
+    let neuronIndex = Math.floor(Math.random() * this.layers[layer].length);
+
+    // pick a random connection
+    let connectionIndex = Math.floor(Math.random() * this.layers[layer][neuronIndex].connections.length);
+
+    // TODO: all the neurons have references to the same connection.
+    // randomly adjust it.
+    this.layers[layer][neuronIndex].connections[connectionIndex].weight += Math.random() * 2 - 1;
   }
+ 
+  ProcessLayers() {
+    this.GetInputs();
+    for (let layerIndex = 1; layerIndex < this.layers.length; layerIndex++) {
+      for (let ni = 0; ni < this.layers[layerIndex].length; ni++) {
+        
+        let inputValues = 0;
+        for (let ci = 0; ci < this.layers[layerIndex][ni].connections.length - 1; ci++) {
+          // input times a weight
+          inputValues += this.layers[layerIndex - 1][ci].value * this.layers[layerIndex][ni].connections[ci].weight;
+        }
+
+        // add a bias
+        inputValues += this.layers[layerIndex][ni].connections[this.layers[layerIndex][ni].connections.length - 1].weight;
+
+        // activate
+        //// this.layers[layerIndex][ni].value = 1 / (1 + Math.exp(-inputValues));  // sigmoid
+        this.layers[layerIndex][ni].value = Math.tanh(inputValues);
+        //// this.layers[layerIndex][ni].value = Math.max(0,inputValues); // ReLU
+      }
+    }
+  }
+
+  // RestoreBrain(populationIndex) {
+  //   var oldBrain = JSON.parse(localStorage.getItem("BrainSave" + populationIndex));
+  //   if (oldBrain !== null) {
+  //     if (
+  //       this.layers[1].length === oldBrain[0].length && this.layers[1][0].connections.length === oldBrain[0][0].connections.length &&
+  //       this.layers[2].length === oldBrain[1].length && this.layers[2][0].connections.length === oldBrain[1][0].connections.length &&
+  //       this.layers[3].length === oldBrain[2].length && this.layers[3][0].connections.length === oldBrain[2][0].connections.length
+  //     ) {
+  //       this.layers = oldBrain;
+  //       // this.layers[1] = oldBrain[1];
+  //       // this.layers[2] = oldBrain[2];
+  //       // this.layers[3] = oldBrain[3];
+  //     }
+  //   }
+  // }
+  // SaveBrain(populationIndex) {
+  //   var dotString = JSON.stringify(this.layers);
+  //   localStorage.setItem("BrainSave" + populationIndex, dotString);
+  // }
+
   StopAtWall() {
     if (this.x > ctx.canvas.width - 1) {
       this.x = ctx.canvas.width - 1;
@@ -282,12 +241,6 @@ class Dot {
       this.y = 0;
       this.vector.y = 0;
     }
-  }
-  Think() {
-    this.GetInputs();
-    this.ProcessLayer(this.layer1, this.layers[0]);
-    this.ProcessLayer(this.layer2, this.layer1);
-    this.ProcessLayer(this.outputLayer, this.layer2);
   }
   Wrap() {
     if (this.x > ctx.canvas.width - 1) {
