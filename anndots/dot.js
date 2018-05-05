@@ -18,12 +18,19 @@ class Dot {
     this.y = Math.random() * ctx.canvas.height;
 
     this.layers = [];
-    this.layers.push(new Array(13).fill({
-      value: 0
-    }));
-    this.layers.push(new Array(6).fill(new neuron(this.layers[0].length)));
-    this.layers.push(new Array(6).fill(new neuron(this.layers[1].length)));
-    this.layers.push(new Array(4).fill(new neuron(this.layers[2].length)));
+    this.layers.push(new Array(13));
+    this.layers.push(new Array(6));
+    this.layers.push(new Array(6));
+    this.layers.push(new Array(4));
+
+    // fill layers
+    for (let layerIndex = 1; layerIndex < this.layers.length; layerIndex++) {
+      for (let ni = 0; ni < this.layers[layerIndex].length; ni++) {
+        this.layers[layerIndex][ni] = new neuron(this.layers[layerIndex-1].length);
+      }
+    }
+   
+
   }
   CheckDots(population) {
     let smallestdistance = 100000000;
@@ -204,58 +211,26 @@ class Dot {
     }
   }
 
-  // RestoreBrain(populationIndex) {
-  //   var oldBrain = JSON.parse(localStorage.getItem("BrainSave" + populationIndex));
-  //   if (oldBrain !== null) {
-  //     if (
-  //       this.layers[1].length === oldBrain[0].length && this.layers[1][0].connections.length === oldBrain[0][0].connections.length &&
-  //       this.layers[2].length === oldBrain[1].length && this.layers[2][0].connections.length === oldBrain[1][0].connections.length &&
-  //       this.layers[3].length === oldBrain[2].length && this.layers[3][0].connections.length === oldBrain[2][0].connections.length
-  //     ) {
-  //       this.layers = oldBrain;
-  //       // this.layers[1] = oldBrain[1];
-  //       // this.layers[2] = oldBrain[2];
-  //       // this.layers[3] = oldBrain[3];
-  //     }
-  //   }
-  // }
-  // SaveBrain(populationIndex) {
-  //   var dotString = JSON.stringify(this.layers);
-  //   localStorage.setItem("BrainSave" + populationIndex, dotString);
-  // }
+  RestoreBrain(populationIndex) {
+    var oldBrain = JSON.parse(localStorage.getItem("BrainSave" + populationIndex));
+    if (oldBrain !== null) {
+      if (
+        this.layers[1].length === oldBrain[0].length && this.layers[1][0].connections.length === oldBrain[0][0].connections.length &&
+        this.layers[2].length === oldBrain[1].length && this.layers[2][0].connections.length === oldBrain[1][0].connections.length &&
+        this.layers[3].length === oldBrain[2].length && this.layers[3][0].connections.length === oldBrain[2][0].connections.length
+      ) {
+        this.layers = oldBrain;
+        // this.layers[1] = oldBrain[1];
+        // this.layers[2] = oldBrain[2];
+        // this.layers[3] = oldBrain[3];
+      }
+    }
+  }
+  SaveBrain(populationIndex) {
+    var dotString = JSON.stringify(this.layers);
+    localStorage.setItem("BrainSave" + populationIndex, dotString);
+  }
 
-  StopAtWall() {
-    if (this.x > ctx.canvas.width - 1) {
-      this.x = ctx.canvas.width - 1;
-      this.vector.x = 0;
-    }
-    if (this.x < 0) {
-      this.x = 0;
-      this.vector.x = 0;
-    }
-    if (this.y > ctx.canvas.height - 1) {
-      this.y = ctx.canvas.height - 1;
-      this.vector.y = 0;
-    }
-    if (this.y < 0) {
-      this.y = 0;
-      this.vector.y = 0;
-    }
-  }
-  Wrap() {
-    if (this.x > ctx.canvas.width - 1) {
-      this.x = 0;
-    }
-    if (this.x < 0) {
-      this.x = ctx.canvas.width - 1;
-    }
-    if (this.y > ctx.canvas.height - 1) {
-      this.y = 0;
-    }
-    if (this.y < 0) {
-      this.y = ctx.canvas.height - 1;
-    }
-  }
   WallDeath() {
     return (
       this.x > ctx.canvas.width - 1 ||

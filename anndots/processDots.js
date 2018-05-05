@@ -51,9 +51,9 @@ function Init() {
           break;
       }
 
-      //if (i < dotCount * 0.90) {
-       // populations[popI].dots[i].RestoreBrain(popI);
-      //}
+      if (i < dotCount * 0.90) {
+       populations[popI].dots[i].RestoreBrain(popI);
+      }
     }
   }
 
@@ -93,9 +93,9 @@ function DoTheThings() {
       let dotIndex = 0; dotIndex < populations[popI].dots.length; dotIndex++
     ) {
       if (populations[popI].dots[dotIndex].CheckDeath() === true) {
-        // if (populations[popI].dots[dotIndex].age >= populations[popI].data.highestAge) {
-        //   populations[popI].dots[dotIndex].SaveBrain(popI);
-        // }
+        if (populations[popI].dots[dotIndex].age >= populations[popI].data.highestAge) {
+          populations[popI].dots[dotIndex].SaveBrain(popI);
+        }
 
         let copyDot = populations[popI].data.oldestDot;
         if (Math.random() < 0.5) {
