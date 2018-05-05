@@ -213,18 +213,7 @@ class Dot {
 
   RestoreBrain(populationIndex) {
     var oldBrain = JSON.parse(localStorage.getItem("BrainSave" + populationIndex));
-    if (oldBrain !== null) {
-      if (
-        this.layers[1].length === oldBrain[0].length && this.layers[1][0].connections.length === oldBrain[0][0].connections.length &&
-        this.layers[2].length === oldBrain[1].length && this.layers[2][0].connections.length === oldBrain[1][0].connections.length &&
-        this.layers[3].length === oldBrain[2].length && this.layers[3][0].connections.length === oldBrain[2][0].connections.length
-      ) {
-        this.layers = oldBrain;
-        // this.layers[1] = oldBrain[1];
-        // this.layers[2] = oldBrain[2];
-        // this.layers[3] = oldBrain[3];
-      }
-    }
+    this.layers = oldBrain;
   }
   SaveBrain(populationIndex) {
     var dotString = JSON.stringify(this.layers);
