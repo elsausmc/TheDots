@@ -6,10 +6,10 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 50;
+let dotCount = 10;
 let veryOldest = 0;
 
-let populationCount = 3;
+let populationCount = 6;
 let populations = [];
 
 function Init() {
@@ -44,8 +44,22 @@ function Init() {
           break;
         case 2:
           populations[popI].dots[i].color = {
-            r: 127,
-            g: 127,
+            r: 0,
+            g: 0,
+            b: 255
+          };
+          break;
+        case 3:
+          populations[popI].dots[i].color = {
+            r: 255,
+            g: 255,
+            b: 0
+          };
+          break;
+        case 4:
+          populations[popI].dots[i].color = {
+            r: 0,
+            g: 255,
             b: 255
           };
           break;

@@ -18,18 +18,20 @@ class Dot {
     this.y = Math.random() * ctx.canvas.height;
 
     this.layers = [];
-    this.layers.push(new Array(13));
-    this.layers.push(new Array(6));
-    this.layers.push(new Array(6));
+    this.layers.push(new Array(14));
+    this.layers.push(new Array(10));
+    this.layers.push(new Array(10));
+    this.layers.push(new Array(10));
+    this.layers.push(new Array(10));
     this.layers.push(new Array(4));
 
     // fill layers
     for (let layerIndex = 1; layerIndex < this.layers.length; layerIndex++) {
       for (let ni = 0; ni < this.layers[layerIndex].length; ni++) {
-        this.layers[layerIndex][ni] = new neuron(this.layers[layerIndex-1].length);
+        this.layers[layerIndex][ni] = new neuron(this.layers[layerIndex - 1].length);
       }
     }
-   
+
 
   }
   CheckDots(population) {
@@ -165,6 +167,10 @@ class Dot {
     });
 
     this.layers[0].push({
+      value: this.DifferentColor(this.nearestDot.color)
+    });
+
+    this.layers[0].push({
       value: this.nearestFood.x - this.x
     });
     this.layers[0].push({
@@ -188,12 +194,12 @@ class Dot {
     // randomly adjust it.
     this.layers[layer][neuronIndex].connections[connectionIndex].weight += Math.random() * 2 - 1;
   }
- 
+
   ProcessLayers() {
     this.GetInputs();
     for (let layerIndex = 1; layerIndex < this.layers.length; layerIndex++) {
       for (let ni = 0; ni < this.layers[layerIndex].length; ni++) {
-        
+
         let inputValues = 0;
         for (let ci = 0; ci < this.layers[layerIndex][ni].connections.length - 1; ci++) {
           // input times a weight
@@ -213,7 +219,25 @@ class Dot {
 
   RestoreBrain(populationIndex) {
     var oldBrain = JSON.parse(localStorage.getItem("BrainSave" + populationIndex));
-    this.layers = oldBrain;
+    if (oldBrain != null) {
+      // does the net have the same amount of layers?
+      if (this.layers.length === oldBrain.length) {
+        for (let li = 1; li < this.layers.length; li++) {
+
+          // does the layer have the same amount of neurons?
+          if (this.layers[li].length === oldBrain[li].length) {
+            for (let ni = 0; ni < this.layers[li].length; ni++) {
+
+              // does the neuron have the same amount of connections?
+              if (this.layers[li][ni].connections.length === oldBrain[li][ni].connections.length) {
+                // copy that floppy.
+                this.layers[li][ni].connections = oldBrain[li][ni].connections;
+              }
+            }
+          }
+        }
+      }
+    }
   }
   SaveBrain(populationIndex) {
     var dotString = JSON.stringify(this.layers);
