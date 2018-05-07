@@ -66,7 +66,7 @@ function Init() {
       }
 
       if (i < dotCount * 0.90) {
-       populations[popI].dots[i].RestoreBrain(popI);
+       populations[popI].dots[i].brain.Restore(popI);
       }
     }
   }
@@ -108,7 +108,7 @@ function DoTheThings() {
     ) {
       if (populations[popI].dots[dotIndex].CheckDeath() === true) {
         if (populations[popI].dots[dotIndex].age >= populations[popI].data.highestAge) {
-          populations[popI].dots[dotIndex].SaveBrain(popI);
+          populations[popI].dots[dotIndex].brain.Save(popI);
         }
 
         let copyDot = populations[popI].data.oldestDot;
@@ -116,10 +116,10 @@ function DoTheThings() {
           copyDot = Math.floor(Math.random() * populations[popI].dots.length);
         }
 
-        populations[popI].dots[dotIndex].CopyBrain(
-          populations[popI].dots[copyDot]
+        populations[popI].dots[dotIndex].brain.Copy(
+          populations[popI].dots[copyDot].brain
         );
-        populations[popI].dots[dotIndex].MutateBrain();
+        populations[popI].dots[dotIndex].brain.Mutate();
 
         populations[popI].dots[dotIndex].x = Math.random() * ctx.canvas.width;
         populations[popI].dots[dotIndex].y = Math.random() * ctx.canvas.height;

@@ -16,24 +16,9 @@ class Dot {
     this.nearestFood = null;
     this.x = Math.random() * ctx.canvas.width;
     this.y = Math.random() * ctx.canvas.height;
-
-    this.layers = [];
-    this.layers.push(new Array(14));
-    this.layers.push(new Array(10));
-    this.layers.push(new Array(10));
-    this.layers.push(new Array(10));
-    this.layers.push(new Array(10));
-    this.layers.push(new Array(4));
-
-    // fill layers
-    for (let layerIndex = 1; layerIndex < this.layers.length; layerIndex++) {
-      for (let ni = 0; ni < this.layers[layerIndex].length; ni++) {
-        this.layers[layerIndex][ni] = new neuron(this.layers[layerIndex - 1].length);
-      }
-    }
-
-
+    this.brain = new Brain();
   }
+
   CheckDots(population) {
     let smallestdistance = 100000000;
     for (let popI = 0; popI < population.length; popI++) {
@@ -69,9 +54,11 @@ class Dot {
       }
     }
   }
+
   CheckDeath() {
     return this.Consumed() || this.life < 0 || this.WallDeath();
   }
+
   Consumed() {
     if (this.nearestDot !== null) {
       const dx = this.x - this.nearestDot.x;
@@ -91,6 +78,7 @@ class Dot {
     }
     return false;
   }
+
   DifferentColor(otherColor) {
     return (
       this.color.r !== otherColor.r ||
@@ -98,24 +86,12 @@ class Dot {
       this.color.b !== otherColor.b
     );
   }
-  CopyBrain(otherDot) {
-    // loop through layers
-    for (let layerIndex = 1; layerIndex < this.layers.length; layerIndex++) {
-      // loop though neurons
-      for (let ni = 0; ni < this.layers[layerIndex].length; ni++) {
-        // loop though connections
-        for (let nc = 0; nc < this.layers[layerIndex][ni].connections.length; nc++) {
-          // copy that floppy
-          this.layers[layerIndex][ni].connections[nc].weight = otherDot.layers[layerIndex][ni].connections[nc].weight;
-        }
-      }
-    }
-  }
+  
   DoMovement() {
-    this.ProcessLayers();
-    let lastLayer = this.layers.length - 1;
-    this.vector.x += this.layers[lastLayer][0].value - this.layers[lastLayer][1].value;
-    this.vector.y += this.layers[lastLayer][2].value - this.layers[lastLayer][3].value;
+    this.ThinkAboutStuff();
+    let lastLayer = this.brain.layers.length - 1;
+    this.vector.x += this.brain.layers[lastLayer][0].value - this.brain.layers[lastLayer][1].value;
+    this.vector.y += this.brain.layers[lastLayer][2].value - this.brain.layers[lastLayer][3].value;
     this.x += this.vector.x;
     this.y += this.vector.y;
 
@@ -123,127 +99,71 @@ class Dot {
     this.life -= this.tickRate + lastVector;
     this.age++;
   }
+
   GetDistance(otherDot) {
     const dx = this.x - otherDot.x;
     const dy = this.y - otherDot.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
     return distance;
   }
+
   GetInputs() {
-    this.layers[0] = [];
+    this.brain.layers[0] = [];
 
-    let lastLayer = this.layers.length - 1;
-    this.layers[0].push({
-      value: this.layers[lastLayer][0].value
+    let lastLayer = this.brain.layers.length - 1;
+    this.brain.layers[0].push({
+      value: this.brain.layers[lastLayer][0].value
     });
-    this.layers[0].push({
-      value: this.layers[lastLayer][1].value
+    this.brain.layers[0].push({
+      value: this.brain.layers[lastLayer][1].value
     });
-    this.layers[0].push({
-      value: this.layers[lastLayer][2].value
+    this.brain.layers[0].push({
+      value: this.brain.layers[lastLayer][2].value
     });
-    this.layers[0].push({
-      value: this.layers[lastLayer][3].value
+    this.brain.layers[0].push({
+      value: this.brain.layers[lastLayer][3].value
     });
 
-    this.layers[0].push({
+    this.brain.layers[0].push({
       value: this.life
     });
-    this.layers[0].push({
+    this.brain.layers[0].push({
       value: this.vector.x
     });
-    this.layers[0].push({
+    this.brain.layers[0].push({
       value: this.vector.y
     });
 
-    this.layers[0].push({
+    this.brain.layers[0].push({
       value: this.nearestDot.x - this.x
     });
-    this.layers[0].push({
+    this.brain.layers[0].push({
       value: this.nearestDot.y - this.y
     });
-    this.layers[0].push({
+    this.brain.layers[0].push({
       value: this.nearestDot.life - this.life
     });
 
-    this.layers[0].push({
+    this.brain.layers[0].push({
       value: this.DifferentColor(this.nearestDot.color)
     });
 
-    this.layers[0].push({
+    this.brain.layers[0].push({
       value: this.nearestFood.x - this.x
     });
-    this.layers[0].push({
+    this.brain.layers[0].push({
       value: this.nearestFood.y - this.y
     });
-    this.layers[0].push({
+    this.brain.layers[0].push({
       value: this.nearestFood.life - this.life
     });
   }
-  MutateBrain() {
-    // pick a random layer
-    const layer = 1 + Math.floor(Math.random() * (this.layers.length - 1));
 
-    // pick a random neuron
-    let neuronIndex = Math.floor(Math.random() * this.layers[layer].length);
-
-    // pick a random connection
-    let connectionIndex = Math.floor(Math.random() * this.layers[layer][neuronIndex].connections.length);
-
-    // TODO: all the neurons have references to the same connection.
-    // randomly adjust it.
-    this.layers[layer][neuronIndex].connections[connectionIndex].weight += Math.random() * 2 - 1;
-  }
-
-  ProcessLayers() {
+  ThinkAboutStuff() {
     this.GetInputs();
-    for (let layerIndex = 1; layerIndex < this.layers.length; layerIndex++) {
-      for (let ni = 0; ni < this.layers[layerIndex].length; ni++) {
-
-        let inputValues = 0;
-        for (let ci = 0; ci < this.layers[layerIndex][ni].connections.length - 1; ci++) {
-          // input times a weight
-          inputValues += this.layers[layerIndex - 1][ci].value * this.layers[layerIndex][ni].connections[ci].weight;
-        }
-
-        // add a bias
-        inputValues += this.layers[layerIndex][ni].connections[this.layers[layerIndex][ni].connections.length - 1].weight;
-
-        // activate
-        //// this.layers[layerIndex][ni].value = 1 / (1 + Math.exp(-inputValues));  // sigmoid
-        this.layers[layerIndex][ni].value = Math.tanh(inputValues);
-        //// this.layers[layerIndex][ni].value = Math.max(0,inputValues); // ReLU
-      }
-    }
+    this.brain.ProcessLayers();
   }
-
-  RestoreBrain(populationIndex) {
-    var oldBrain = JSON.parse(localStorage.getItem("BrainSave" + populationIndex));
-    if (oldBrain != null) {
-      // does the net have the same amount of layers?
-      if (this.layers.length === oldBrain.length) {
-        for (let li = 1; li < this.layers.length; li++) {
-
-          // does the layer have the same amount of neurons?
-          if (this.layers[li].length === oldBrain[li].length) {
-            for (let ni = 0; ni < this.layers[li].length; ni++) {
-
-              // does the neuron have the same amount of connections?
-              if (this.layers[li][ni].connections.length === oldBrain[li][ni].connections.length) {
-                // copy that floppy.
-                this.layers[li][ni].connections = oldBrain[li][ni].connections;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  SaveBrain(populationIndex) {
-    var dotString = JSON.stringify(this.layers);
-    localStorage.setItem("BrainSave" + populationIndex, dotString);
-  }
-
+  
   WallDeath() {
     return (
       this.x > ctx.canvas.width - 1 ||
