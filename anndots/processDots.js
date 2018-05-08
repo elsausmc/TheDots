@@ -6,10 +6,10 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 25;
+let dotCount = 50;
 let veryOldest = 0;
 
-let populationCount = 6;
+let populationCount = 3;
 let populations = [];
 
 function Init() {
@@ -45,7 +45,7 @@ function Init() {
         case 2:
           populations[popI].dots[i].color = {
             r: 0,
-            g: 0,
+            g: 255,
             b: 255
           };
           break;
@@ -59,7 +59,7 @@ function Init() {
         case 4:
           populations[popI].dots[i].color = {
             r: 0,
-            g: 255,
+            g: 0,
             b: 255
           };
           break;
@@ -151,12 +151,12 @@ function DrawGrid() {
       let y = Math.floor(populations[popI].dots[i].y);
 
       let dotSize = 1;
-      if (i === populations[popI].data.oldestDot) {
-        dotSize = 2;
-        if (populations[popI].dots[i].age >= veryOldest) {
-          dotSize = 3;
-        }
-      }
+      // // if (i === populations[popI].data.oldestDot) {
+      // //   dotSize = 2;
+      // //   if (populations[popI].dots[i].age >= veryOldest) {
+      // //     dotSize = 3;
+      // //   }
+      // // }
 
 
       for (let xx = x - dotSize; xx <= x + dotSize; xx++) {
