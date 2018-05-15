@@ -17,9 +17,12 @@ class Dot {
     this.x = Math.random() * ctx.canvas.width;
     this.y = Math.random() * ctx.canvas.height;
     this.brain = new Brain();
+    this.population = [];
   }
 
   CheckDots(population) {
+    this.population = population;
+
     let smallestdistance = 100000000;
     for (let popI = 0; popI < population.length; popI++) {
       for (
@@ -148,15 +151,41 @@ class Dot {
       value: this.DifferentColor(this.nearestDot.color)
     });
 
-    this.brain.layers[0].push({
-      value: this.nearestFood.x - this.x
-    });
-    this.brain.layers[0].push({
-      value: this.nearestFood.y - this.y
-    });
-    this.brain.layers[0].push({
-      value: this.nearestFood.life - this.life
-    });
+    // // this.brain.layers[0].push({
+    // //   value: this.nearestFood.x - this.x
+    // // });
+    // // this.brain.layers[0].push({
+    // //   value: this.nearestFood.y - this.y
+    // // });
+    // // this.brain.layers[0].push({
+    // //   value: this.nearestFood.life - this.life
+    // // });
+
+    // // // population to inputs
+    // // for (let popI = 0; popI < this.population.length; popI++) {
+    // //   for (let doti = 0; doti < this.population[popI].dots.length; doti++) {
+    // //     const dot = this.population[popI].dots[doti];
+        
+    // //     this.brain.layers[0].push({
+    // //       value: dot.x - this.x
+    // //     });
+
+    // //     this.brain.layers[0].push({
+    // //       value: dot.y - this.y
+    // //     });
+
+    // //     this.brain.layers[0].push({
+    // //       value: dot.life - this.life
+    // //     });
+    
+    // //     this.brain.layers[0].push({
+    // //       value: this.DifferentColor(dot.color)
+    // //     });
+
+    // //   }
+      
+    // // }
+
   }
 
   ThinkAboutStuff() {

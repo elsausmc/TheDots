@@ -6,10 +6,10 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 50;
+let dotCount = 25;
 let veryOldest = 0;
 
-let populationCount = 3;
+let populationCount = 6;
 let populations = [];
 
 function Init() {
@@ -85,6 +85,7 @@ function DoTheThings() {
       populations[popI].dots[i].CheckDots(populations);
 
       populations[popI].dots[i].DoMovement();
+
       if (populations[popI].dots[i].life > populations[popI].data.mostLife) {
         populations[popI].data.mostLife = populations[popI].dots[i].life;
       }
