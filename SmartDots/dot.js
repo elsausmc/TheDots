@@ -89,7 +89,7 @@ class Dot {
       this.color.b !== otherColor.b
     );
   }
-  
+
   DoMovement() {
     this.ThinkAboutStuff();
     let lastLayer = this.brain.layers.length - 1;
@@ -148,7 +148,13 @@ class Dot {
     });
 
     this.brain.layers[0].push({
-      value: this.DifferentColor(this.nearestDot.color)
+      value: this.nearestDot.color.r
+    });
+    this.brain.layers[0].push({
+      value: this.nearestDot.color.g
+    });
+    this.brain.layers[0].push({
+      value: this.nearestDot.color.b
     });
 
     // // this.brain.layers[0].push({
@@ -160,39 +166,13 @@ class Dot {
     // // this.brain.layers[0].push({
     // //   value: this.nearestFood.life - this.life
     // // });
-
-    // // // population to inputs
-    // // for (let popI = 0; popI < this.population.length; popI++) {
-    // //   for (let doti = 0; doti < this.population[popI].dots.length; doti++) {
-    // //     const dot = this.population[popI].dots[doti];
-        
-    // //     this.brain.layers[0].push({
-    // //       value: dot.x - this.x
-    // //     });
-
-    // //     this.brain.layers[0].push({
-    // //       value: dot.y - this.y
-    // //     });
-
-    // //     this.brain.layers[0].push({
-    // //       value: dot.life - this.life
-    // //     });
-    
-    // //     this.brain.layers[0].push({
-    // //       value: this.DifferentColor(dot.color)
-    // //     });
-
-    // //   }
-      
-    // // }
-
   }
 
   ThinkAboutStuff() {
     this.GetInputs();
     this.brain.ProcessLayers();
   }
-  
+
   WallDeath() {
     return (
       this.x > ctx.canvas.width - 1 ||

@@ -66,7 +66,7 @@ function Init() {
       }
 
       if (i < dotCount * 0.90) {
-       populations[popI].dots[i].brain.Restore(popI);
+        populations[popI].dots[i].brain.Restore(popI);
       }
     }
   }
@@ -152,13 +152,6 @@ function DrawGrid() {
       let y = Math.floor(populations[popI].dots[i].y);
 
       let dotSize = 1;
-      // // if (i === populations[popI].data.oldestDot) {
-      // //   dotSize = 2;
-      // //   if (populations[popI].dots[i].age >= veryOldest) {
-      // //     dotSize = 3;
-      // //   }
-      // // }
-
 
       for (let xx = x - dotSize; xx <= x + dotSize; xx++) {
         for (let yy = y - dotSize; yy <= y + dotSize; yy++) {
@@ -180,12 +173,6 @@ function DrawGrid() {
   }
 
   ctx.putImageData(pixels, 0, 0);
-
-  // // ctx.font = "10px Arial";
-  // // ctx.fillStyle = "white";
-  // // ctx.fillText("average energy: " + averageLife.toFixed(3), 10, 40);
-  // // ctx.fillText("most energy: " + populations[popI].data.mostLife.toFixed(3), 10, 50);
-  // // ctx.fillText("oldest age: " + populations[popI].data.highestAge, 10, 60);
 
   setTimeout(function () {
     DrawGrid();
