@@ -157,15 +157,15 @@ class Dot {
       value: this.nearestDot.color.b
     });
 
-    // // this.brain.layers[0].push({
-    // //   value: this.nearestFood.x - this.x
-    // // });
-    // // this.brain.layers[0].push({
-    // //   value: this.nearestFood.y - this.y
-    // // });
-    // // this.brain.layers[0].push({
-    // //   value: this.nearestFood.life - this.life
-    // // });
+    this.brain.layers[0].push({
+      value: this.nearestFood.x - this.x
+    });
+    this.brain.layers[0].push({
+      value: this.nearestFood.y - this.y
+    });
+    this.brain.layers[0].push({
+      value: this.nearestFood.life - this.life
+    });
   }
 
   ThinkAboutStuff() {
