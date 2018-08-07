@@ -37,22 +37,22 @@ class Dot {
           }
 
           // check closest food
-          if (this.DifferentColor(population[popI].dots[closeIndex].color)) {
-            if (this.nearestFood === null) {
-              this.nearestFood = population[popI].dots[closeIndex];
-            }
+          // // if (this.DifferentColor(population[popI].dots[closeIndex].color)) {
+          // //   if (this.nearestFood === null) {
+          // //     this.nearestFood = population[popI].dots[closeIndex];
+          // //   }
 
-            const foodDistance = this.GetDistance(
-              population[popI].dots[closeIndex]
-            );
+          // //   const foodDistance = this.GetDistance(
+          // //     population[popI].dots[closeIndex]
+          // //   );
 
-            if (
-              foodDistance <= this.GetDistance(this.nearestFood) &&
-              population[popI].dots[closeIndex].life <= this.nearestFood.life
-            ) {
-              this.nearestFood = population[popI].dots[closeIndex];
-            }
-          }
+          // //   if (
+          // //     foodDistance <= this.GetDistance(this.nearestFood) &&
+          // //     population[popI].dots[closeIndex].life <= this.nearestFood.life
+          // //   ) {
+          // //     this.nearestFood = population[popI].dots[closeIndex];
+          // //   }
+          // // }
         }
       }
     }
@@ -68,7 +68,7 @@ class Dot {
       const dy = this.y - this.nearestDot.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
       if (distance < 5) {
-        if (this.DifferentColor(this.nearestDot.color)) {
+        ////if (this.DifferentColor(this.nearestDot.color)) {
           if (this.life < this.nearestDot.life) {
             this.life = -2;
             return true;
@@ -76,7 +76,7 @@ class Dot {
             this.life += 2;
             return false;
           }
-        }
+        ////}
       }
     }
     return false;
@@ -90,8 +90,8 @@ class Dot {
     );
   }
 
-  DoMovement() {
-    this.ThinkAboutStuff();
+  DoMovement(cWidth, cHeight) {
+    this.ThinkAboutStuff(cWidth, cHeight);
     let lastLayer = this.brain.layers.length - 1;
     this.vector.x += this.brain.layers[lastLayer][0].value - this.brain.layers[lastLayer][1].value;
     this.vector.y += this.brain.layers[lastLayer][2].value - this.brain.layers[lastLayer][3].value;
@@ -110,7 +110,7 @@ class Dot {
     return distance;
   }
 
-  GetInputs() {
+  GetInputs(cWidth, cHeight) {
     this.brain.layers[0] = [];
 
     let lastLayer = this.brain.layers.length - 1;
@@ -157,19 +157,27 @@ class Dot {
       value: this.nearestDot.color.b
     });
 
+    // // this.brain.layers[0].push({
+    // //   value: this.nearestFood.x - this.x
+    // // });
+    // // this.brain.layers[0].push({
+    // //   value: this.nearestFood.y - this.y
+    // // });
+    // // this.brain.layers[0].push({
+    // //   value: this.nearestFood.life - this.life
+    // // });
+
     this.brain.layers[0].push({
-      value: this.nearestFood.x - this.x
+      value: (this.x - cWidth) / cWidth
     });
+    
     this.brain.layers[0].push({
-      value: this.nearestFood.y - this.y
-    });
-    this.brain.layers[0].push({
-      value: this.nearestFood.life - this.life
+      value: (this.y - cHeight) / cHeight
     });
   }
 
-  ThinkAboutStuff() {
-    this.GetInputs();
+  ThinkAboutStuff(cWidth, cHeight) {
+    this.GetInputs(cWidth, cHeight);
     this.brain.ProcessLayers();
   }
 

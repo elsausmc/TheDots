@@ -76,6 +76,8 @@ function Init() {
 
 function DoTheThings() {
   veryOldest = 0;
+  centerX = ctx.canvas.width / 2;
+  centerY = ctx.canvas.height / 2;
   for (let popI = 0; popI < populationCount; popI++) {
     let totalLife = 0;
     populations[popI].data.highestAge = 0;
@@ -84,7 +86,7 @@ function DoTheThings() {
       totalLife += populations[popI].dots[i].life;
       populations[popI].dots[i].CheckDots(populations);
 
-      populations[popI].dots[i].DoMovement();
+      populations[popI].dots[i].DoMovement(centerX, centerY);
 
       if (populations[popI].dots[i].life > populations[popI].data.mostLife) {
         populations[popI].data.mostLife = populations[popI].dots[i].life;
