@@ -16,7 +16,7 @@ function Init() {
   for (let popI = 0; popI < populationCount; popI++) {
     populations.push({
       data: {
-        mostLife: 0,
+        mostEnergy: 0,
         highestAverage: 0,
         averageAge: 0,
         highestAge: 0,
@@ -79,17 +79,17 @@ function DoTheThings() {
   centerX = ctx.canvas.width / 2;
   centerY = ctx.canvas.height / 2;
   for (let popI = 0; popI < populationCount; popI++) {
-    let totalLife = 0;
+    let totalEnergy = 0;
     populations[popI].data.highestAge = 0;
-    populations[popI].data.mostLife = 0;
+    populations[popI].data.mostEnergy = 0;
     for (let i = 0; i < dotCount; i++) {
-      totalLife += populations[popI].dots[i].life;
+      totalEnergy += populations[popI].dots[i].energy;
       populations[popI].dots[i].CheckDots(populations);
 
       populations[popI].dots[i].DoMovement(centerX, centerY);
 
-      if (populations[popI].dots[i].life > populations[popI].data.mostLife) {
-        populations[popI].data.mostLife = populations[popI].dots[i].life;
+      if (populations[popI].dots[i].energy > populations[popI].data.mostEnergy) {
+        populations[popI].data.mostEnergy = populations[popI].dots[i].energy;
       }
 
       if (populations[popI].dots[i].age > populations[popI].data.highestAge) {
@@ -101,9 +101,9 @@ function DoTheThings() {
       }
     }
 
-    let averageLife = totalLife / dotCount;
-    if (averageLife > populations[popI].data.highestAverage) {
-      populations[popI].data.highestAverage = averageLife;
+    let averageEnergy = totalEnergy / dotCount;
+    if (averageEnergy > populations[popI].data.highestAverage) {
+      populations[popI].data.highestAverage = averageEnergy;
     }
 
     for (
@@ -130,6 +130,11 @@ function DoTheThings() {
           populations[popI].dots[dotIndex].brain.Copy(
             populations[popI].dots[copyDot].brain
           );
+
+          let cDot = populations[popI].dots[copyDot];
+          populations[popI].dots[dotIndex].color.r = cDot.color.r;
+          populations[popI].dots[dotIndex].color.g = cDot.color.g;
+          populations[popI].dots[dotIndex].color.b = cDot.color.b;
         }
 
         populations[popI].dots[dotIndex].brain.Mutate();
@@ -139,7 +144,7 @@ function DoTheThings() {
 
         populations[popI].dots[dotIndex].vector.x = 0;
         populations[popI].dots[dotIndex].vector.y = 0;
-        populations[popI].dots[dotIndex].life = 10;
+        populations[popI].dots[dotIndex].energy = 10;
         populations[popI].dots[dotIndex].age = 0;
       }
     }

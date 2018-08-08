@@ -1,7 +1,7 @@
 class neuron {
   constructor(connectionCount) {
     // one for the bias and one for cycling back in.
-    connectionCount += 3;
+    connectionCount += 1;
 
     this.value = 0;
     this.connections = [];

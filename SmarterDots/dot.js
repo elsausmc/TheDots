@@ -10,7 +10,7 @@ class Dot {
       b: 127, // Math.floor(Math.random() * 256) //127 + Math.floor(Math.random() * 127)
     };
     this.age = 0;
-    this.life = Math.random() * 10;
+    this.energy = Math.random() * 10;
     this.tickRate = 0.02;
     this.nearestDot = null;
     this.nearestFood = null;
@@ -49,7 +49,7 @@ class Dot {
 
           // //   if (
           // //     foodDistance <= this.GetDistance(this.nearestFood) &&
-          // //     population[popI].dots[closeIndex].life <= this.nearestFood.life
+          // //     population[popI].dots[closeIndex].energy <= this.nearestFood.energy
           // //   ) {
           // //     this.nearestFood = population[popI].dots[closeIndex];
           // //   }
@@ -60,7 +60,7 @@ class Dot {
   }
 
   CheckDeath() {
-    return this.Consumed() || this.life < 0 || this.WallDeath();
+    return this.Consumed() || this.energy < 0 || this.WallDeath();
   }
 
   CopyColor() {
@@ -82,12 +82,12 @@ class Dot {
       const distance = Math.sqrt(dx * dx + dy * dy);
       if (distance < 5) {
         ////if (this.DifferentColor(this.nearestDot.color)) {
-          if (this.life < this.nearestDot.life) {
-            this.life = -2;
+          if (this.energy < this.nearestDot.energy) {
+            this.energy = -2;
             this.consumed = true;
             return true;
           } else {
-            this.life += 2;
+            this.energy += this.nearestDot.energy;
             return false;
           }
         ////}
@@ -113,7 +113,7 @@ class Dot {
     this.y += this.vector.y;
 
     const lastVector = Math.sqrt(this.vector.x * this.vector.x + this.vector.y * this.vector.y) / 1000;
-    this.life -= this.tickRate + lastVector;
+    this.energy -= this.tickRate + lastVector;
     this.age++;
   }
 
@@ -142,7 +142,7 @@ class Dot {
     });
 
     this.brain.layers[0].push({
-      value: this.life
+      value: this.energy
     });
     this.brain.layers[0].push({
       value: this.vector.x
@@ -158,7 +158,7 @@ class Dot {
       value: this.nearestDot.y - this.y
     });
     this.brain.layers[0].push({
-      value: this.nearestDot.life - this.life
+      value: this.nearestDot.energy - this.energy
     });
 
     this.brain.layers[0].push({
@@ -178,7 +178,7 @@ class Dot {
     // //   value: this.nearestFood.y - this.y
     // // });
     // // this.brain.layers[0].push({
-    // //   value: this.nearestFood.life - this.life
+    // //   value: this.nearestFood.energy - this.energy
     // // });
 
     this.brain.layers[0].push({
