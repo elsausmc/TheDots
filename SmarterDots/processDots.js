@@ -115,9 +115,9 @@ function DoTheThings() {
         }
 
         let copyDot = populations[popI].data.oldestDot;
-        if (Math.random() < 0.5) {
-          copyDot = Math.floor(Math.random() * populations[popI].dots.length);
-        }
+        // if (Math.random() < 0.5) {
+        //   copyDot = Math.floor(Math.random() * populations[popI].dots.length);
+        // }
 
         // got et
         if (populations[popI].dots[dotIndex].consumed === true){
@@ -144,7 +144,7 @@ function DoTheThings() {
 
         populations[popI].dots[dotIndex].vector.x = 0;
         populations[popI].dots[dotIndex].vector.y = 0;
-        populations[popI].dots[dotIndex].energy = 10;
+        populations[popI].dots[dotIndex].energy = 2;
         populations[popI].dots[dotIndex].age = 0;
       }
     }
