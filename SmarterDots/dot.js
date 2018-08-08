@@ -5,9 +5,9 @@ class Dot {
       y: 0
     };
     this.color = {
-      r: Math.floor(Math.random() * 256), //127 + Math.floor(Math.random() * 127),
-      g: Math.floor(Math.random() * 256), //127 + Math.floor(Math.random() * 127),
-      b: Math.floor(Math.random() * 256) //127 + Math.floor(Math.random() * 127)
+      r: 127, // Math.floor(Math.random() * 256), //127 + Math.floor(Math.random() * 127),
+      g: 127, // Math.floor(Math.random() * 256), //127 + Math.floor(Math.random() * 127),
+      b: 127, // Math.floor(Math.random() * 256) //127 + Math.floor(Math.random() * 127)
     };
     this.age = 0;
     this.life = Math.random() * 10;
@@ -18,6 +18,7 @@ class Dot {
     this.y = Math.random() * ctx.canvas.height;
     this.brain = new Brain();
     this.population = [];
+    this.consumed = false;
   }
 
   CheckDots(population) {
@@ -62,6 +63,18 @@ class Dot {
     return this.Consumed() || this.life < 0 || this.WallDeath();
   }
 
+  CopyColor() {
+    this.color.r = this.ColorBoundCheck(this.nearestDot.color.r + Math.floor((Math.random() * 32) - 16));
+    this.color.g = this.ColorBoundCheck(this.nearestDot.color.g + Math.floor((Math.random() * 32) - 16));
+    this.color.b = this.ColorBoundCheck(this.nearestDot.color.b + Math.floor((Math.random() * 32) - 16));
+  }
+
+  ColorBoundCheck(color) {
+    if(color > 255) { return 255; }
+    if(color < 0) { return 0; }
+    return color;
+  }
+
   Consumed() {
     if (this.nearestDot !== null) {
       const dx = this.x - this.nearestDot.x;
@@ -71,6 +84,7 @@ class Dot {
         ////if (this.DifferentColor(this.nearestDot.color)) {
           if (this.life < this.nearestDot.life) {
             this.life = -2;
+            this.consumed = true;
             return true;
           } else {
             this.life += 2;

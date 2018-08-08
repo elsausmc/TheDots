@@ -6,10 +6,10 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 25;
+let dotCount = 200;
 let veryOldest = 0;
 
-let populationCount = 6;
+let populationCount = 1;
 let populations = [];
 
 function Init() {
@@ -27,43 +27,43 @@ function Init() {
 
     for (let i = 0; i < dotCount; i++) {
       populations[popI].dots.push(new Dot());
-      switch (popI) {
-        case 0:
-          populations[popI].dots[i].color = {
-            r: 0,
-            g: 255,
-            b: 0
-          };
-          break;
-        case 1:
-          populations[popI].dots[i].color = {
-            r: 255,
-            g: 0,
-            b: 0
-          };
-          break;
-        case 2:
-          populations[popI].dots[i].color = {
-            r: 0,
-            g: 255,
-            b: 255
-          };
-          break;
-        case 3:
-          populations[popI].dots[i].color = {
-            r: 255,
-            g: 255,
-            b: 0
-          };
-          break;
-        case 4:
-          populations[popI].dots[i].color = {
-            r: 0,
-            g: 0,
-            b: 255
-          };
-          break;
-      }
+      // // switch (popI) {
+      // //   case 0:
+      // //     populations[popI].dots[i].color = {
+      // //       r: 0,
+      // //       g: 255,
+      // //       b: 0
+      // //     };
+      // //     break;
+      // //   case 1:
+      // //     populations[popI].dots[i].color = {
+      // //       r: 255,
+      // //       g: 0,
+      // //       b: 0
+      // //     };
+      // //     break;
+      // //   case 2:
+      // //     populations[popI].dots[i].color = {
+      // //       r: 0,
+      // //       g: 255,
+      // //       b: 255
+      // //     };
+      // //     break;
+      // //   case 3:
+      // //     populations[popI].dots[i].color = {
+      // //       r: 255,
+      // //       g: 255,
+      // //       b: 0
+      // //     };
+      // //     break;
+      // //   case 4:
+      // //     populations[popI].dots[i].color = {
+      // //       r: 0,
+      // //       g: 0,
+      // //       b: 255
+      // //     };
+      // //     break;
+      // // }
 
       if (i < dotCount * 0.90) {
         populations[popI].dots[i].brain.Restore(popI);
@@ -119,9 +119,19 @@ function DoTheThings() {
           copyDot = Math.floor(Math.random() * populations[popI].dots.length);
         }
 
-        populations[popI].dots[dotIndex].brain.Copy(
-          populations[popI].dots[copyDot].brain
-        );
+        // got et
+        if (populations[popI].dots[dotIndex].consumed === true){
+          populations[popI].dots[dotIndex].brain.Copy(
+            populations[popI].dots[dotIndex].nearestDot.brain
+          );
+          populations[popI].dots[dotIndex].CopyColor();
+          populations[popI].dots[dotIndex].consumed = false;
+        } else {
+          populations[popI].dots[dotIndex].brain.Copy(
+            populations[popI].dots[copyDot].brain
+          );
+        }
+
         populations[popI].dots[dotIndex].brain.Mutate();
 
         populations[popI].dots[dotIndex].x = Math.random() * ctx.canvas.width;
