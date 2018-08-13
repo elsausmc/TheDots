@@ -21,42 +21,20 @@ class Dot {
     this.consumed = false;
   }
 
-  CheckDots(population) {
-    this.population = population;
-
+  CheckDots(pop) {
     let smallestdistance = 100000000;
-    for (let popI = 0; popI < population.length; popI++) {
       for (
-        let closeIndex = 0; closeIndex < population[popI].dots.length; closeIndex++
+        let closeIndex = 0; closeIndex < pop.dots.length; closeIndex++
       ) {
-        if (this !== population[popI].dots[closeIndex]) {
+        if (this !== pop.dots[closeIndex]) {
           // check closeness
-          const distance = this.GetDistance(population[popI].dots[closeIndex]);
+          const distance = this.GetDistance(pop.dots[closeIndex]);
           if (distance < smallestdistance) {
             smallestdistance = distance;
-            this.nearestDot = population[popI].dots[closeIndex];
+            this.nearestDot = pop.dots[closeIndex];
           }
-
-          // check closest food
-          // // if (this.DifferentColor(population[popI].dots[closeIndex].color)) {
-          // //   if (this.nearestFood === null) {
-          // //     this.nearestFood = population[popI].dots[closeIndex];
-          // //   }
-
-          // //   const foodDistance = this.GetDistance(
-          // //     population[popI].dots[closeIndex]
-          // //   );
-
-          // //   if (
-          // //     foodDistance <= this.GetDistance(this.nearestFood) &&
-          // //     population[popI].dots[closeIndex].energy <= this.nearestFood.energy
-          // //   ) {
-          // //     this.nearestFood = population[popI].dots[closeIndex];
-          // //   }
-          // // }
         }
       }
-    }
   }
 
   CheckDeath() {
@@ -81,7 +59,6 @@ class Dot {
       const dy = this.y - this.nearestDot.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
       if (distance < 5) {
-        ////if (this.DifferentColor(this.nearestDot.color)) {
           if (this.energy < this.nearestDot.energy) {
             this.energy = -2;
             this.consumed = true;
@@ -90,7 +67,6 @@ class Dot {
             this.energy += this.nearestDot.energy;
             return false;
           }
-        ////}
       }
     }
     return false;
@@ -170,16 +146,6 @@ class Dot {
     this.brain.layers[0].push({
       value: this.nearestDot.color.b
     });
-
-    // // this.brain.layers[0].push({
-    // //   value: this.nearestFood.x - this.x
-    // // });
-    // // this.brain.layers[0].push({
-    // //   value: this.nearestFood.y - this.y
-    // // });
-    // // this.brain.layers[0].push({
-    // //   value: this.nearestFood.energy - this.energy
-    // // });
 
     this.brain.layers[0].push({
       value: (this.x - cWidth) / cWidth

@@ -6,68 +6,26 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 200;
-let veryOldest = 0;
+let dotCount = 100;
 
-let populationCount = 1;
-let populations = [];
+let population = {
+  data: {
+    mostEnergy: 0,
+    mostEnergyIndex: 0,
+    highestAverage: 0,
+    averageAge: 0,
+    oldestAge: 0,
+    oldestAgeIndex: 0
+  },
+  dots: []
+};
 
 function Init() {
-  for (let popI = 0; popI < populationCount; popI++) {
-    populations.push({
-      data: {
-        mostEnergy: 0,
-        highestAverage: 0,
-        averageAge: 0,
-        highestAge: 0,
-        oldestDot: 0
-      },
-      dots: []
-    });
+  for (let i = 0; i < dotCount; i++) {
+    population.dots.push(new Dot());
 
-    for (let i = 0; i < dotCount; i++) {
-      populations[popI].dots.push(new Dot());
-      // // switch (popI) {
-      // //   case 0:
-      // //     populations[popI].dots[i].color = {
-      // //       r: 0,
-      // //       g: 255,
-      // //       b: 0
-      // //     };
-      // //     break;
-      // //   case 1:
-      // //     populations[popI].dots[i].color = {
-      // //       r: 255,
-      // //       g: 0,
-      // //       b: 0
-      // //     };
-      // //     break;
-      // //   case 2:
-      // //     populations[popI].dots[i].color = {
-      // //       r: 0,
-      // //       g: 255,
-      // //       b: 255
-      // //     };
-      // //     break;
-      // //   case 3:
-      // //     populations[popI].dots[i].color = {
-      // //       r: 255,
-      // //       g: 255,
-      // //       b: 0
-      // //     };
-      // //     break;
-      // //   case 4:
-      // //     populations[popI].dots[i].color = {
-      // //       r: 0,
-      // //       g: 0,
-      // //       b: 255
-      // //     };
-      // //     break;
-      // // }
-
-      if (i < dotCount * 0.90) {
-        populations[popI].dots[i].brain.Restore(popI);
-      }
+    if (i < dotCount * 0.90) {
+      population.dots[i].brain.Restore();
     }
   }
 
@@ -75,78 +33,75 @@ function Init() {
 }
 
 function DoTheThings() {
-  veryOldest = 0;
   centerX = ctx.canvas.width / 2;
   centerY = ctx.canvas.height / 2;
-  for (let popI = 0; popI < populationCount; popI++) {
-    let totalEnergy = 0;
-    populations[popI].data.highestAge = 0;
-    populations[popI].data.mostEnergy = 0;
-    for (let i = 0; i < dotCount; i++) {
-      totalEnergy += populations[popI].dots[i].energy;
-      populations[popI].dots[i].CheckDots(populations);
 
-      populations[popI].dots[i].DoMovement(centerX, centerY);
+  let totalEnergy = 0;
+  population.data.oldestAge = 0;
+  population.data.mostEnergy = 0;
 
-      if (populations[popI].dots[i].energy > populations[popI].data.mostEnergy) {
-        populations[popI].data.mostEnergy = populations[popI].dots[i].energy;
-      }
+  for (let i = 0; i < dotCount; i++) {
+    totalEnergy += population.dots[i].energy;
+    population.dots[i].CheckDots(population);
 
-      if (populations[popI].dots[i].age > populations[popI].data.highestAge) {
-        populations[popI].data.oldestDot = i;
-        populations[popI].data.highestAge = populations[popI].dots[i].age;
-        if (populations[popI].dots[i].age > veryOldest) {
-          veryOldest = populations[popI].dots[i].age;
-        }
-      }
+    population.dots[i].DoMovement(centerX, centerY);
+
+    if (population.dots[i].energy > population.data.mostEnergy) {
+      population.mostEnergyIndex = i;
+      population.data.mostEnergy = population.dots[i].energy;
     }
 
-    let averageEnergy = totalEnergy / dotCount;
-    if (averageEnergy > populations[popI].data.highestAverage) {
-      populations[popI].data.highestAverage = averageEnergy;
+    if (population.dots[i].age > population.data.oldestAge) {
+      population.data.oldestAgeIndex = i;
+      population.data.oldestAge = population.dots[i].age;
     }
+  }
 
-    for (
-      let dotIndex = 0; dotIndex < populations[popI].dots.length; dotIndex++
-    ) {
-      if (populations[popI].dots[dotIndex].CheckDeath() === true) {
-        if (populations[popI].dots[dotIndex].age >= populations[popI].data.highestAge) {
-          populations[popI].dots[dotIndex].brain.Save(popI);
-        }
+  let averageEnergy = totalEnergy / dotCount;
+  if (averageEnergy > population.data.highestAverage) {
+    population.data.highestAverage = averageEnergy;
+  }
 
-        let copyDot = populations[popI].data.oldestDot;
-        // if (Math.random() < 0.5) {
-        //   copyDot = Math.floor(Math.random() * populations[popI].dots.length);
-        // }
-
-        // got et
-        if (populations[popI].dots[dotIndex].consumed === true){
-          populations[popI].dots[dotIndex].brain.Copy(
-            populations[popI].dots[dotIndex].nearestDot.brain
-          );
-          populations[popI].dots[dotIndex].CopyColor();
-          populations[popI].dots[dotIndex].consumed = false;
-        } else {
-          populations[popI].dots[dotIndex].brain.Copy(
-            populations[popI].dots[copyDot].brain
-          );
-
-          let cDot = populations[popI].dots[copyDot];
-          populations[popI].dots[dotIndex].color.r = cDot.color.r;
-          populations[popI].dots[dotIndex].color.g = cDot.color.g;
-          populations[popI].dots[dotIndex].color.b = cDot.color.b;
-        }
-
-        populations[popI].dots[dotIndex].brain.Mutate();
-
-        populations[popI].dots[dotIndex].x = Math.random() * ctx.canvas.width;
-        populations[popI].dots[dotIndex].y = Math.random() * ctx.canvas.height;
-
-        populations[popI].dots[dotIndex].vector.x = 0;
-        populations[popI].dots[dotIndex].vector.y = 0;
-        populations[popI].dots[dotIndex].energy = 2;
-        populations[popI].dots[dotIndex].age = 0;
+  for (
+    let dotIndex = 0; dotIndex < population.dots.length; dotIndex++
+  ) {
+    if (population.dots[dotIndex].CheckDeath() === true) {
+      if (population.dots[dotIndex].age >= population.data.oldestAge) {
+        population.dots[dotIndex].brain.Save();
       }
+
+      let copyDot = population.data.oldestAgeIndex;
+      if(Math.random() < 0.5) {
+        copyDot = population.data.mostEnergyIndex;
+      }
+
+      // got et
+      if (population.dots[dotIndex].consumed === true) {
+        population.dots[dotIndex].brain.Copy(
+          population.dots[dotIndex].nearestDot.brain
+        );
+        population.dots[dotIndex].CopyColor();
+        population.dots[dotIndex].consumed = false;
+      } else {
+        population.dots[dotIndex].brain.Copy(
+          population.dots[copyDot].brain
+        );
+
+        let cDot = population.dots[copyDot];
+        population.dots[dotIndex].color.r = cDot.color.r;
+        population.dots[dotIndex].color.g = cDot.color.g;
+        population.dots[dotIndex].color.b = cDot.color.b;
+      }
+
+      population.dots[dotIndex].brain.Mutate();
+
+      population.dots[dotIndex].x = Math.random() * ctx.canvas.width;
+      population.dots[dotIndex].y = Math.random() * ctx.canvas.height;
+
+      population.dots[dotIndex].vector.x = 0;
+      population.dots[dotIndex].vector.y = 0;
+      population.dots[dotIndex].energy = 2;
+      population.dots[dotIndex].age = 0;
     }
   }
 }
@@ -163,27 +118,25 @@ function DrawGrid() {
   let index = 0;
 
   // draw
-  for (let popI = 0; popI < populationCount; popI++) {
-    for (let i = 0; i < dotCount; i++) {
-      let x = Math.floor(populations[popI].dots[i].x);
-      let y = Math.floor(populations[popI].dots[i].y);
+  for (let i = 0; i < dotCount; i++) {
+    let x = Math.floor(population.dots[i].x);
+    let y = Math.floor(population.dots[i].y);
 
-      let dotSize = 1;
+    let dotSize = 1;
 
-      for (let xx = x - dotSize; xx <= x + dotSize; xx++) {
-        for (let yy = y - dotSize; yy <= y + dotSize; yy++) {
-          index = (xx + yy * ctx.canvas.width) * 4;
-          if (!(
-              xx < 0 ||
-              yy < 0 ||
-              xx > ctx.canvas.width ||
-              yy > ctx.canvas.height
-            )) {
-            pixels.data[index] = populations[popI].dots[i].color.r; //colorShift;
-            pixels.data[index + 1] = populations[popI].dots[i].color.g; //255 - colorShift;
-            pixels.data[index + 2] = populations[popI].dots[i].color.b; //0;
-            pixels.data[index + 3] = 255;
-          }
+    for (let xx = x - dotSize; xx <= x + dotSize; xx++) {
+      for (let yy = y - dotSize; yy <= y + dotSize; yy++) {
+        index = (xx + yy * ctx.canvas.width) * 4;
+        if (!(
+            xx < 0 ||
+            yy < 0 ||
+            xx > ctx.canvas.width ||
+            yy > ctx.canvas.height
+          )) {
+          pixels.data[index] = population.dots[i].color.r;
+          pixels.data[index + 1] = population.dots[i].color.g;
+          pixels.data[index + 2] = population.dots[i].color.b;
+          pixels.data[index + 3] = 255;
         }
       }
     }

@@ -71,8 +71,8 @@ class Brain {
     }
   }
 
-  Restore(populationIndex) {
-    var oldBrain = JSON.parse(localStorage.getItem("BrainSave" + populationIndex));
+  Restore() {
+    var oldBrain = JSON.parse(localStorage.getItem("BrainSave"));
     if (oldBrain != null) {
       // does the net have the same amount of layers?
       if (this.layers.length === oldBrain.length) {
@@ -93,8 +93,8 @@ class Brain {
       }
     }
   }
-  Save(populationIndex) {
+  Save() {
     var dotString = JSON.stringify(this.layers);
-    localStorage.setItem("BrainSave" + populationIndex, dotString);
+    localStorage.setItem("BrainSave", dotString);
   }
 }
