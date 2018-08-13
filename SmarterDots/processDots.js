@@ -6,7 +6,7 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 100;
+let dotCount = 500;
 
 let population = {
   data: {
@@ -71,7 +71,7 @@ function DoTheThings() {
       }
 
       let copyDot = population.data.oldestAgeIndex;
-      if(Math.random() < 0.5) {
+      if (Math.random() < 0.5) {
         copyDot = population.data.mostEnergyIndex;
       }
 
@@ -82,6 +82,11 @@ function DoTheThings() {
         );
         population.dots[dotIndex].CopyColor();
         population.dots[dotIndex].consumed = false;
+        do {
+          population.dots[dotIndex].x = population.dots[dotIndex].x + ((Math.random() * 100) - 50);
+          population.dots[dotIndex].y = population.dots[dotIndex].y + ((Math.random() * 100) - 50);
+        } while (population.dots[dotIndex].x < 0 && population.dots[dotIndex].x > ctx.canvas.width && population.dots[dotIndex].y < 0 && population.dots[dotIndex].y > ctx.canvas.height)
+
       } else {
         population.dots[dotIndex].brain.Copy(
           population.dots[copyDot].brain
@@ -91,12 +96,12 @@ function DoTheThings() {
         population.dots[dotIndex].color.r = cDot.color.r;
         population.dots[dotIndex].color.g = cDot.color.g;
         population.dots[dotIndex].color.b = cDot.color.b;
+
+        population.dots[dotIndex].x = Math.random() * ctx.canvas.width;
+        population.dots[dotIndex].y = Math.random() * ctx.canvas.height;
       }
 
       population.dots[dotIndex].brain.Mutate();
-
-      population.dots[dotIndex].x = Math.random() * ctx.canvas.width;
-      population.dots[dotIndex].y = Math.random() * ctx.canvas.height;
 
       population.dots[dotIndex].vector.x = 0;
       population.dots[dotIndex].vector.y = 0;

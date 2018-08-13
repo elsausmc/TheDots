@@ -42,9 +42,9 @@ class Dot {
   }
 
   CopyColor() {
-    this.color.r = this.ColorBoundCheck(this.nearestDot.color.r + Math.floor((Math.random() * 32) - 16));
-    this.color.g = this.ColorBoundCheck(this.nearestDot.color.g + Math.floor((Math.random() * 32) - 16));
-    this.color.b = this.ColorBoundCheck(this.nearestDot.color.b + Math.floor((Math.random() * 32) - 16));
+    this.color.r = this.ColorBoundCheck(this.nearestDot.color.r + Math.floor((Math.random() * 64) - 32));
+    this.color.g = this.ColorBoundCheck(this.nearestDot.color.g + Math.floor((Math.random() * 64) - 32));
+    this.color.b = this.ColorBoundCheck(this.nearestDot.color.b + Math.floor((Math.random() * 64) - 32));
   }
 
   ColorBoundCheck(color) {
@@ -138,13 +138,13 @@ class Dot {
     });
 
     this.brain.layers[0].push({
-      value: this.nearestDot.color.r
+      value: Math.abs(this.color.r - this.nearestDot.color.r)
     });
     this.brain.layers[0].push({
-      value: this.nearestDot.color.g
+      value:  Math.abs(this.color.g - this.nearestDot.color.g)
     });
     this.brain.layers[0].push({
-      value: this.nearestDot.color.b
+      value:  Math.abs(this.color.b - this.nearestDot.color.b)
     });
 
     this.brain.layers[0].push({
