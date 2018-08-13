@@ -6,7 +6,7 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 500;
+let dotCount = 200;
 
 let population = {
   data: {
@@ -129,15 +129,15 @@ function DrawGrid() {
 
     let dotSize = 1;
 
-    for (let xx = x - dotSize; xx <= x + dotSize; xx++) {
-      for (let yy = y - dotSize; yy <= y + dotSize; yy++) {
-        index = (xx + yy * ctx.canvas.width) * 4;
-        if (!(
-            xx < 0 ||
-            yy < 0 ||
-            xx > ctx.canvas.width ||
-            yy > ctx.canvas.height
-          )) {
+    if (!(
+        x < 1 ||
+        y < 1 ||
+        x > ctx.canvas.width ||
+        y > ctx.canvas.height
+      )) {
+      for (let xx = x - dotSize; xx <= x + dotSize; xx++) {
+        for (let yy = y - dotSize; yy <= y + dotSize; yy++) {
+          index = (xx + yy * ctx.canvas.width) * 4;
           pixels.data[index] = population.dots[i].color.r;
           pixels.data[index + 1] = population.dots[i].color.g;
           pixels.data[index + 2] = population.dots[i].color.b;

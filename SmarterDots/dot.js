@@ -163,10 +163,10 @@ class Dot {
 
   WallDeath() {
     return (
-      this.x > ctx.canvas.width - 1 ||
-      this.x < 0 ||
-      this.y > ctx.canvas.height - 1 ||
-      this.y < 0
+      this.x > ctx.canvas.width ||
+      this.x < 1 ||
+      this.y > ctx.canvas.height ||
+      this.y < 1
     );
   }
 }
