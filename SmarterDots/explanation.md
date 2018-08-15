@@ -11,3 +11,5 @@ Each dot has it's own unique neural network. As inputs they know
 And they have four outputs that get used to determine up/down and left/right.
 Start with some energy.
 Dot with most energy consumes dot with less energy.
+Dot resurrects within a 100x100 area of where it was consumed.
+Consumer get remaining energy.
