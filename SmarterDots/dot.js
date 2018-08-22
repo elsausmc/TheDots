@@ -127,6 +127,7 @@ class Dot {
       value: this.vector.y
     });
 
+    if ( this.GetDistance(this.nearestDot) < 50 ) {
     this.brain.layers[0].push({
       value: this.nearestDot.x - this.x
     });
@@ -146,6 +147,14 @@ class Dot {
     this.brain.layers[0].push({
       value:  Math.abs(this.color.b - this.nearestDot.color.b)
     });
+  } else {
+    this.brain.layers[0].push({ value: 0 });
+    this.brain.layers[0].push({ value: 0 });
+    this.brain.layers[0].push({ value: 0 });
+    this.brain.layers[0].push({ value: 0 });
+    this.brain.layers[0].push({ value: 0 });
+    this.brain.layers[0].push({ value: 0 });
+  }
 
     this.brain.layers[0].push({
       value: (this.x - cWidth) / cWidth
