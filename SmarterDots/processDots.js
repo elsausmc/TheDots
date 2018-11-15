@@ -6,7 +6,8 @@ ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
 let pixels;
-let dotCount = 500;
+let density = 4000;
+let dotCount = (ctx.canvas.width * ctx.canvas.height) / density;
 
 let population = {
   data: {
@@ -85,7 +86,7 @@ function DoTheThings() {
         do {
           population.dots[dotIndex].x = population.dots[dotIndex].x + ((Math.random() * 100) - 50);
           population.dots[dotIndex].y = population.dots[dotIndex].y + ((Math.random() * 100) - 50);
-        } while (population.dots[dotIndex].x < 0 && population.dots[dotIndex].x > ctx.canvas.width && population.dots[dotIndex].y < 0 && population.dots[dotIndex].y > ctx.canvas.height)
+        } while (population.dots[dotIndex].x < 0 && population.dots[dotIndex].x > ctx.canvas.width && population.dots[dotIndex].y < 0 && population.dots[dotIndex].y > ctx.canvas.height);
 
       } else {
         population.dots[dotIndex].brain.Copy(
@@ -135,15 +136,24 @@ function DrawGrid() {
         x > ctx.canvas.width ||
         y > ctx.canvas.height
       )) {
-      for (let xx = x - dotSize; xx <= x + dotSize; xx++) {
-        for (let yy = y - dotSize; yy <= y + dotSize; yy++) {
-          index = (xx + yy * ctx.canvas.width) * 4;
-          pixels.data[index] = population.dots[i].color.r;
-          pixels.data[index + 1] = population.dots[i].color.g;
-          pixels.data[index + 2] = population.dots[i].color.b;
-          pixels.data[index + 3] = 255;
-        }
-      }
+
+        PlacePixel(x-1, y-1, population.dots[i].color,64);
+        PlacePixel(x, y-1, population.dots[i].color,0);
+        PlacePixel(x+1, y-1, population.dots[i].color,64);
+
+        PlacePixel(x-1, y, population.dots[i].color,0);
+        PlacePixel(x, y, population.dots[i].color,0);
+        PlacePixel(x+1, y, population.dots[i].color,0);
+
+        PlacePixel(x-1, y+1, population.dots[i].color,64);
+        PlacePixel(x, y+1, population.dots[i].color,0);
+        PlacePixel(x+1, y+1, population.dots[i].color,64);
+
+      // // for (let xx = x - dotSize; xx <= x + dotSize; xx++) {
+      // //   for (let yy = y - dotSize; yy <= y + dotSize; yy++) {
+      // //     PlacePixel(xx, yy, population.dots[i].color);
+      // //   }
+      // // }
     }
   }
 
@@ -153,6 +163,14 @@ function DrawGrid() {
     DrawGrid();
   }, 1);
   return;
+}
+
+function PlacePixel(x,y,color,d) {
+  const index = (x + y * ctx.canvas.width) * 4;
+  pixels.data[index] = color.r-d;
+  pixels.data[index + 1] = color.g-d;
+  pixels.data[index + 2] = color.b-d;
+  pixels.data[index + 3] = 255;
 }
 
 Init();
