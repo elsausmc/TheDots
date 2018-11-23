@@ -168,7 +168,8 @@ function DrawGrid() {
 }
 
 function DrawBrain(dotIndex) {
-  const brain = population.dots[dotIndex].brain;
+  const dot = population.dots[dotIndex];
+  const brain = dot.brain;
   const layerSize = 200 / brain.layers.length;
   for (let layerIndex = 1; layerIndex < brain.layers.length; layerIndex++) {
     const layer = brain.layers[layerIndex];
@@ -177,9 +178,9 @@ function DrawBrain(dotIndex) {
     for (let neuronIndex = 0; neuronIndex < layer.length; neuronIndex++) {
       const neuronValue = layer[neuronIndex].value;
       PlaceSquare(Math.floor(layerIndex * layerSize), Math.floor((1+neuronIndex) * neuronSize), {
-        r: 127 + (64 * neuronValue),
-        g: 127 + (64 * neuronValue),
-        b: 127 + (64 * neuronValue)
+        r: 64 + (dot.color.r / 2) + (64 * neuronValue),
+        g: 64 + (dot.color.g / 2) + (64 * neuronValue),
+        b: 64 + (dot.color.b / 2) + (64 * neuronValue)
       }, 10);
     }
   }
