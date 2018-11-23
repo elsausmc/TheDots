@@ -178,9 +178,9 @@ function DrawBrain(dotIndex) {
     for (let neuronIndex = 0; neuronIndex < layer.length; neuronIndex++) {
       const neuronValue = layer[neuronIndex].value;
       PlaceSquare(Math.floor(layerIndex * layerSize), Math.floor((1+neuronIndex) * neuronSize), {
-        r: 64 + (dot.color.r / 2) + (64 * neuronValue),
-        g: 64 + (dot.color.g / 2) + (64 * neuronValue),
-        b: 64 + (dot.color.b / 2) + (64 * neuronValue)
+        r: (dot.color.r / 2) + (127 * neuronValue),
+        g: (dot.color.g / 2) + (127 * neuronValue),
+        b: (dot.color.b / 2) + (127 * neuronValue)
       }, 10);
     }
   }
