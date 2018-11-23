@@ -1,6 +1,7 @@
 let cvs = document.getElementById("gridCanvas");
 let ctx = cvs.getContext("2d");
 
+
 ctx.canvas.width = window.innerWidth;
 ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
@@ -115,12 +116,12 @@ function DoTheThings() {
 function DrawGrid() {
   ctx.canvas.width = window.innerWidth;
   ctx.canvas.height = window.innerHeight;
-
+  
   DoTheThings();
-
+  
   // clear screen
   pixels = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
-
+  
   ////let index = 0;
 
   // draw
@@ -158,8 +159,12 @@ function DrawGrid() {
   }
 
   DrawBrain(population.data.oldestAgeIndex);
-
+  
   ctx.putImageData(pixels, 0, 0);
+
+  ctx.font = "10px Arial";
+  ctx.fillStyle = "white";
+  ctx.fillText("dot: " + population.data.oldestAgeIndex,90,10);
 
   setTimeout(function () {
     DrawGrid();
