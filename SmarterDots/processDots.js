@@ -5,7 +5,7 @@ ctx.canvas.width = window.innerWidth;
 ctx.canvas.height = window.innerHeight;
 let centerX = ctx.canvas.width / 2;
 let centerY = ctx.canvas.height / 2;
-let pixels;
+let pixels = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
 let density = 4000;
 let dotCount = (ctx.canvas.width * ctx.canvas.height) / density;
 
@@ -121,14 +121,14 @@ function DrawGrid() {
   // clear screen
   pixels = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
 
-  let index = 0;
+  ////let index = 0;
 
   // draw
   for (let i = 0; i < dotCount; i++) {
     let x = Math.floor(population.dots[i].x);
     let y = Math.floor(population.dots[i].y);
 
-    let dotSize = 1;
+    ////let dotSize = 1;
 
     if (!(
         x < 1 ||
@@ -137,17 +137,17 @@ function DrawGrid() {
         y > ctx.canvas.height
       )) {
 
-        PlacePixel(x-1, y-1, population.dots[i].color,64);
-        PlacePixel(x, y-1, population.dots[i].color,0);
-        PlacePixel(x+1, y-1, population.dots[i].color,64);
+      PlacePixel(x - 1, y - 1, population.dots[i].color, 64);
+      PlacePixel(x, y - 1, population.dots[i].color, 0);
+      PlacePixel(x + 1, y - 1, population.dots[i].color, 64);
 
-        PlacePixel(x-1, y, population.dots[i].color,0);
-        PlacePixel(x, y, population.dots[i].color,0);
-        PlacePixel(x+1, y, population.dots[i].color,0);
+      PlacePixel(x - 1, y, population.dots[i].color, 0);
+      PlacePixel(x, y, population.dots[i].color, 0);
+      PlacePixel(x + 1, y, population.dots[i].color, 0);
 
-        PlacePixel(x-1, y+1, population.dots[i].color,64);
-        PlacePixel(x, y+1, population.dots[i].color,0);
-        PlacePixel(x+1, y+1, population.dots[i].color,64);
+      PlacePixel(x - 1, y + 1, population.dots[i].color, 64);
+      PlacePixel(x, y + 1, population.dots[i].color, 0);
+      PlacePixel(x + 1, y + 1, population.dots[i].color, 64);
 
       // // for (let xx = x - dotSize; xx <= x + dotSize; xx++) {
       // //   for (let yy = y - dotSize; yy <= y + dotSize; yy++) {
@@ -157,6 +157,8 @@ function DrawGrid() {
     }
   }
 
+  DrawBrain(population.data.oldestAgeIndex);
+
   ctx.putImageData(pixels, 0, 0);
 
   setTimeout(function () {
@@ -165,12 +167,39 @@ function DrawGrid() {
   return;
 }
 
-function PlacePixel(x,y,color,d) {
+function DrawBrain(dotIndex) {
+  const brain = population.dots[dotIndex].brain;
+  const layerSize = 200 / brain.layers.length;
+  for (let layerIndex = 1; layerIndex < brain.layers.length; layerIndex++) {
+    const layer = brain.layers[layerIndex];
+
+    const neuronSize = 200 / layer.length;
+    for (let neuronIndex = 0; neuronIndex < layer.length; neuronIndex++) {
+      const neuronValue = layer[neuronIndex].value;
+      PlaceSquare(Math.floor(layerIndex * layerSize), Math.floor((1+neuronIndex) * neuronSize), {
+        r: 127 + (64 * neuronValue),
+        g: 127 + (64 * neuronValue),
+        b: 127 + (64 * neuronValue)
+      }, 10);
+    }
+  }
+}
+
+function PlacePixel(x, y, color, d) {
   const index = (x + y * ctx.canvas.width) * 4;
-  pixels.data[index] = color.r-d;
-  pixels.data[index + 1] = color.g-d;
-  pixels.data[index + 2] = color.b-d;
+  pixels.data[index] = color.r - d;
+  pixels.data[index + 1] = color.g - d;
+  pixels.data[index + 2] = color.b - d;
   pixels.data[index + 3] = 255;
 }
+
+function PlaceSquare(x, y, color, s) {
+  for (let xx = x; xx < x+s; xx++) {
+    for (let yy = y; yy < y+s; yy++) {
+      PlacePixel(xx, yy, color, 0);
+    }
+  }
+}
+
 
 Init();
