@@ -166,6 +166,12 @@ function DrawGrid() {
   ctx.fillStyle = "white";
   ctx.fillText("dot: " + population.data.oldestAgeIndex,90,10);
 
+  const oldDot = population.dots[population.data.oldestAgeIndex];
+  ctx.beginPath();
+  ctx.strokeStyle = "white";
+  ctx.arc(oldDot.x,oldDot.y,50,0,2*Math.PI);
+  ctx.stroke();
+
   setTimeout(function () {
     DrawGrid();
   }, 1);
